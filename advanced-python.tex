@@ -68,36 +68,37 @@
 \end{frame}
 
 \begin{frame}{Programming}
-	The role of a programming language is to allow you to express complex things (\textit{e.g.}, loops) in a ``simple" and readable form, which will be turned into an executable (\textit{i.e.}, a bunch of assemblers) by a \textbf{compiler}, or executed by an \textbf{interpreter}. While the latter is slower, it allows, \textit{e.g.}, for some reflexivity or the capacity to rewrite itself.
+	The role of a programming language is to allow you to express complex things (\textit{e.g.}, loops) in a ``simple" and readable form, which will be turned into an executable (\textit{i.e.}, a bunch of assembler code) by a \textbf{compiler}, or executed by an \textbf{interpreter}. While the latter is slower, it allows, \textit{e.g.}, for some reflexivity or the capacity to rewrite itself.
 	
-	Python is an interpreted language. However, much like Java, it is in practice compiled \textit{on the fly} into an intermediate bytecode representation (the content of \texttt{\_\_pycache\_\_}), which in fact improves itself over time (the more you execute the code, the faster it gets, since it deactivates some of the checks).
+	Python is an \textbf{interpreted} language. However, much like Java, it is in practice compiled \textit{on the fly} into an intermediate bytecode representation (the content of \texttt{\_\_pycache\_\_}), which in fact improves itself over time (the more you execute the code, the faster it gets, since it deactivates some of the checks).
 \end{frame}
 
 \begin{frame}[fragile]
 	The way to write the code is referred to as a \textbf{programming paradigm}, a relatively high-level way to conceptualize and structure the implementation of a computer program.\footnote{\url{https://en.wikipedia.org/wiki/Programming_paradigm}} Among others, there are:\begin{itemize}
 		\item \textbf{Imperative}, in which the code directly controls execution flow and state change. This includes the famous \textbf{procedural} (\mintinline{text}|x = a(); y = b(x);|) and \textbf{object-oriented} (\mintinline{text}|x = X(); x.b();|) approaches.
-		\item \textbf{Declarative}, in which code declares properties of the desired result, but not how to compute it, it describes what computation should be performed. This include the (in)famous \textbf{functional} approach (\mintinline{text}|(b(a()))|), but also programs based on \textbf{logic and constraints}.
-		\item \textbf{Concurrent}, \textbf{visual}, etc...
+		\item \textbf{Declarative}, in which code declares properties of the desired result, but not how to compute it, it describes what computation should be performed. This include the (in)famous \textbf{functional} approach (\mintinline{text}|(b(a()))|), but also programs based on \textbf{logic and constraints} (\mintinline{text}|x: int; y: int; x+y < 3;|).
+		\item But also: \textbf{concurrent}, \textbf{visual}, etc...
 	\end{itemize}
 	
 	To a certain extent, all paradigm can be used in all languages. Python is generally approached as an POO language.
 	\vspace{1em}
 \end{frame}
 
+\section{General concepts for programming}
+
 \begin{frame}{Note on the ``who''}
-	In this presentation, I will distinguish three kinds of people:\begin{enumerate}
+	In this  part, I will distinguish three kinds of people:\begin{enumerate}
 		\item The \textbf{developers}, who actually develop the code/library and eventually provide an API (\textit{application programming interface}).
 		\item The \textbf{programmers}, who use the API provided by the code/library and develop on top of it.
 		\item The \textbf{users}, who use the program/executable, but do not program.
 	\end{enumerate}
 \end{frame}
 
-\section{General concepts for programming}
-
 \begin{frame}{Abstractions}
 \end{frame}
 
 \begin{frame}{Data structures}
+	Note: don't forget $\mathcal O(N)$.
 \end{frame}
 
 \begin{frame}{Design by contract}
@@ -122,6 +123,7 @@
  
  \begin{frame}
  	\begin{itemize}
+ 		\item Use git
  		\item Don't reinvent the wheel (\textit{battery (already) included})
  		\item README \& LICENSE
  		\item packages (\texttt{import stuff})
