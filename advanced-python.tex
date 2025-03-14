@@ -95,19 +95,39 @@
 \end{frame}
 
 \begin{frame}{Abstractions}
+	A good program should be modular, with each of its module having precise responsabilities. All modules can then work together. A good way to do that is by using \textbf{abstraction} (forget about the details and focus on what matters). There are different level of abstraction:
+	\begin{enumerate}
+		\item Abstraction by parameterization: using parameters instead of raw values.
+		\item Abstraction by procedures: dividing your code in functions that call each others (\textit{i.e.}, \textbf{avoid copy-paste-modify}).
+		\item Abstraction by specification: tell \textbf{what} the code is doing, not how (so that if you change the ``how'' without affecting the ``what'', you normally don't break stuffs). More on that latter.
+		\item Data abstraction: instead of using raw data, pack them in \textbf{abstract data types} (objects). Even better, use type hierarchy (\textit{i.e.}, inheritance, each operation of the parent is available to children). More on that latter.
+	\end{enumerate}
 \end{frame}
 
-\begin{frame}{Data structures}
-	Note: don't forget $\mathcal O(N)$.
+\begin{frame}
+	Example: floating type numbers.
 \end{frame}
 
 \begin{frame}{Design by contract}
+	Pre/post-conditions. And invariant? (this is kind of important for ADT, the one for loops are less important).
+\end{frame}
+
+\begin{frame}{Data structures}
+Other example of abstract data types (list, queue, dictionary, etc).
+Note: don't forget $\mathcal O(N)$.
 \end{frame}
 
 \begin{frame}{Documentation}
 \end{frame}
 
 \begin{frame}{Testing}
+	\begin{itemize}
+		\item Test-driven dev
+		\item regression/integration/whatever kind of tests
+		\item Setup/stimuly/verify/teardown.
+		\item Test limit of the domains.
+		\item Factory?
+	\end{itemize}
 \end{frame}
 
 \begin{frame}{Error handling (\textit{exceptions})}
@@ -117,12 +137,18 @@
  \section{POO and POO in Python}
  
  \begin{frame}{What is POO?}
+ 	\begin{itemize}
+ 		\item ADT (and internal representation. Example: a molecule and its atoms.
+ 		\item Methods (CRUDs)  + encapsulation (private/public?).
+ 		\item Instance of a \textbf{class} + methods.
+ 	\end{itemize}
  \end{frame}
  
  \section{Organization of a Python project}
  
  \begin{frame}
  	\begin{itemize}
+ 		\item typing and linting
  		\item Use git
  		\item Don't reinvent the wheel (\textit{battery (already) included})
  		\item README \& LICENSE
