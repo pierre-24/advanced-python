@@ -228,7 +228,9 @@ def _abs(x: float) -> float:
 
 \begin{frame}
 	\begin{itemize}
-		\item \textbf{Errors:} we will see below how to play with errors, but if one sticks to \textit{design by contract} alone, this is not required, since the preconditions \textbf{must always} be fulfilled. In practice, it is generally not the case (\textit{never trust user input}!), so one can perform \textbf{defensive programming} instead, which consists in checking the preconditions, and either failing (throwing exceptions) or running in degraded mode\footnote{Purely falling would be a bit annoying in a plane ;)} if they are not fulfilled.
+		\item \textbf{Errors:} we will see below how to play with errors, but if one sticks to \textit{design by contract} alone, this is not required, since the preconditions \textbf{must always} be fulfilled. 
+		
+		In practice, it is generally not the case (\textit{never trust user input}!), and having undefined behaviors may lead to unexpected bugs (since the execution can continue) or even security issues. Thus, one can abide to \textbf{defensive programming} instead, which consists in weakening the precondition (or delete it), and either report failure (throwing exceptions) or running in degraded mode.\footnote{Purely falling would be a bit annoying in a plane ;)}
 		 \item This leads to \textbf{side-effects}, which is the fact that the code have an observable effect other than reading its input and giving an output. Other example of side-effects include: performing I/O, modifying a non-local variable (\textit{e.g.}, matplotlib's \mintinline{python}|pyplot| interface, which is a state machine), or mutate an argument (\textit{e.g.}, sorting a list in-place).\footnote{BLAS and LAPACK are customary of such practices.} \textbf{All} such side-effects should be \textbf{properly} documented.
 	\end{itemize}
 \end{frame}
@@ -370,7 +372,56 @@ class Dog {
 \end{frame}
 
 \begin{frame}{Error handling (\textit{exceptions})}
-	assert/throw. Also, your user does not want to see your stacktrace (trop d'infos peu digestes).
+	As mentioned above, there are two possible reasons for reporting an error:\begin{enumerate}
+		\item When the precondition is not fulfilled. Again, you should normally not check that, and thus, not report an error for that. However... This is still useful for the developer during implementation. Thus, \textbf{if checking (a part of) the precondition is cheap},\footnote{$\mathcal{O}(1)$, no more.} you can use \mintinline{python}|assert|, which is a function/statement available in many languages that is only compiled/interpreted in ``debug'' mode.\footnote{calling \texttt{python -O -c "assert false"} results in no error.}
+		\item When you want to avoid undefined behavior by weakening the preconditions and issuing errors instead.
+	\end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]
+	And there are two ways to report an error. One is to use the return value or mutate a global variable (or, on languages that allows it, mutate an input designated for that, like \texttt{ierror}):\begin{minted}{python}
+def normalize(x: np.ndarray) -> int:
+	"""
+	pre: x is a vector
+	post: if return value is 0, x is normalized, if return value is 1, it is not.
+	"""
+	norm = np.linalg.norm(x)
+	if norm == 0:
+		return 1
+	x /= norm
+	return 0
+	\end{minted}
+Although totally fine, this is a bit long. Also, the caller can ignore the return value,\footnote{Many bugs in old AND modern programs are due to non-checked return values when allocating memory.} which would in practice create an undefined behavior.
+\vspace{1em}
+\end{frame}
+
+\begin{frame}
+	This is why many ``modern'' programming languages propose a mechanism called \textbf{exceptions}.  It works like this:\begin{itemize}
+		\item When an issue should be issued, the code \textbf{throw} an exception (which can be an integer, a string, or something more complex like and object which allows to provide context).
+		\item The execution propagate up in the call stack, to a point where the error can be handled. If there is none, the execution terminates badly.
+	\end{itemize}
+	This force the caller to handle the exception. It also effectively separate the code that detect the error and the one that handles it.
+\end{frame}
+
+\begin{frame}
+	\begin{center}
+		{\LARGE DEMO TIME!}
+	\end{center}
+\end{frame}
+
+\begin{frame}
+	The take home message here is:\begin{itemize}
+		\item \mintinline{python}|assert| for the developers,
+		\item \mintinline{python}|throw| (+ documentation) for the programmers, and
+		\item a nice error message (eventually in \texttt{stderr}) for the users. The stacktrace frighten them.
+	\end{itemize}
+	
+	
+	And, by the way...
+	
+	\begin{center}
+		\includegraphics[width=.5\linewidth]{im/meme-goto}
+	\end{center}
 \end{frame}
 
 \begin{frame}{Data structures}
