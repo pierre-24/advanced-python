@@ -1,5 +1,6 @@
 \documentclass[10pt,
 %handout
+aspectratio=169
 ]{beamer}
 \usepackage[utf8]{inputenc}
 \usepackage[T1]{fontenc}
@@ -23,6 +24,15 @@
 \usepackage{siunitx}
 \usepackage{mhchem}
 \usepackage{minted}
+\setminted{  
+	frame=lines,  
+	framesep=2mm,  
+	baselinestretch=1.2,  
+	fontsize=\footnotesize,  
+	linenos,  
+	breaklines,
+	tabsize=2
+}  
 
 \author{Pierre Beaujean (\href{mailto:pierre.beaujean@unamur.be}{pierre.beaujean@unamur.be})}
 \title{Advanced Python for advanced users}
@@ -61,17 +71,19 @@
 	 So... A meme will now ensue.
 	
 	\begin{center}
-		\includegraphics[width=.7\linewidth]{im/meme-goto}
+		\includegraphics[width=.6\linewidth]{im/meme-goto}
 		
 		(Note: it is in fact \textbf{conditional jumps})
 	\end{center}
 \end{frame}
 
-\begin{frame}{Programming}
-	The role of a programming language is to allow you to express complex things (\textit{e.g.}, loops) in a ``simple" and readable form, which will be turned into an executable (\textit{i.e.}, a bunch of assembler code) by a \textbf{compiler}, or executed by an \textbf{interpreter}. While the latter is slower, it allows, \textit{e.g.}, for some reflexivity or the capacity to rewrite itself.
+\begin{frame}{Programming in Python}
+	A programming language enables you to express complex logic (\textit{e.g.}, loops, conditionals) in a structured and readable manner. This code is then either translated into machine instructions by a \textbf{compiler} or executed directly by an \textbf{interpreter}. While interpreted languages tend to be slower, they offer advantages such as dynamic execution (\mintinline{python}|exec()|), reflexivity (\mintinline{python}|getattr()|), and the ability to modify itself at runtime.
 	
-	Python is an \textbf{interpreted} language. However, much like Java, it is in practice compiled \textit{on the fly} into an intermediate bytecode representation (the content of \texttt{\_\_pycache\_\_}), which in fact improves itself over time (the more you execute the code, the faster it gets, since it deactivates some of the checks).
+	Python is an \textbf{interpreted} language, but it is also \textit{just-in-time compiled} into an intermediate bytecode representation (stored in \mintinline{text}|__pycache__|). Over time, this process optimizes execution by reducing redundant checks, making subsequent runs of the code faster.
 \end{frame}
+
+
 
 \begin{frame}[fragile]
 	The way to write the code is referred to as a \textbf{programming paradigm}, a relatively high-level way to conceptualize and structure the implementation of a computer program.\footnote{\url{https://en.wikipedia.org/wiki/Programming_paradigm}} Among others, there are:\begin{itemize}
@@ -95,29 +107,116 @@
 \end{frame}
 
 \begin{frame}{Abstractions}
-	A good program should be modular, with each of its module having precise responsabilities. All modules can then work together. A good way to do that is by using \textbf{abstraction} (forget about the details and focus on what matters). There are different level of abstraction:
+	A well-designed program should be \textbf{modular}, with each module having clear and specific responsibilities. They can then work together . One of the best ways to achieve this is through \textbf{abstraction}, which means focusing on what matters while ignoring unnecessary details. There are several levels of abstraction:
 	\begin{enumerate}
-		\item Abstraction by parameterization: using parameters instead of raw values.
-		\item Abstraction by procedures: dividing your code in functions that call each others (\textit{i.e.}, \textbf{avoid copy-paste-modify}).
-		\item Abstraction by specification: tell \textbf{what} the code is doing, not how (so that if you change the ``how'' without affecting the ``what'', you normally don't break stuffs). More on that latter.
-		\item Data abstraction: instead of using raw data, pack them in \textbf{abstract data types} (objects). Even better, use type hierarchy (\textit{i.e.}, inheritance, each operation of the parent is available to children). More on that latter.
+		\item \textbf{Abstraction by Parameterization}: Use parameters instead of hard-coded values to make code flexible and reusable.
+		\item \textbf{Abstraction by Procedures}: Structure your code using functions that call one another, rather than relying on \textit{copy-paste-modify} patterns.
+		\item \textbf{Abstraction by Specification}: Describe \textbf{what} the code should do, not \textbf{how} it does it. This allows you to change the implementation without affecting other parts of the program. (More on this later.)
+		\item \textbf{Data Abstraction}: Instead of using raw data, encapsulate it in \textbf{abstract data types} (e.g., objects). Type hierarchies using \textbf{inheritance}, with child classes inheriting behaviors from parent classes. (More on this later.)
+		\item And others: syntaxic sugar, etc.
 	\end{enumerate}
 \end{frame}
 
+\begin{frame}[fragile]
+	Example(s):
+	\begin{minted}{python}
+# without any abstraction
+print('perimeter of circle is', 2 * 3.141592 * 3.5)
+print('area is', 3.141592 * 3.5 ** 2)
+# abstraction by parameterization
+PI = 3.141592
+r = 3.5
+print('perimeter of circle is', 2 * PI * r)
+print('area is', PI * r ** 2)
+# abstraction by procedure
+from math import pi as PI
+
+def info_circle(r: float) -> None:
+	print('perimeter of circle is', 2 * PI * r)
+	print('area is', PI * r ** 2)
+
+info_circle(3.5)
+info_circle(7.2)
+\end{minted}
+\end{frame}
+
+
+\begin{frame}[fragile]
+	An example of data abstraction (\texttt{fp32}):
+	\begin{center}
+		\begin{tikzpicture}
+			\draw (0, 0) rectangle +(1, 1)  node[midway] {$\mathcal{S}$};
+			\draw (1.5, 0) rectangle +(2, 1)  node[midway] {$\mathcal{E}$};;
+			\draw (4, 0) rectangle +(5, 1)  node[midway] {$\mathcal{M}$};
+			\draw[latex-latex] (0,1.25) -- +(1,0) node[midway,above]{1 bit};
+			\draw[latex-latex] (1.5,1.25) -- +(2,0) node[midway,above]{8 bit};
+			\draw[latex-latex] (4,1.25) -- +(5,0) node[midway,above]{23 bit};
+			\draw[latex-latex] (0,-.25) -- +(9,0) node[midway,below]{32 bit};
+		\end{tikzpicture}
+		\begin{equation*}
+			x = (-1)^\mathcal{S} \times 2^{\mathcal{E}-2^7} \times \left(1+\frac{\mathcal M}{2^{23}}\right).
+		\end{equation*}
+	\end{center}
+	And yet...
+	\begin{minted}{python}
+# let's play with floats:
+x = 2.5e7  # S=0, E=151, M=4111392
+y = x - 3.25e-2
+	\end{minted}
+	This is a powerful abstraction!
+\end{frame}
+
+\begin{frame}{Design by contract (i.e., abstraction by specification)}
+	\vspace*{1em}
+	\begin{columns}
+	\column{.5\linewidth}
+	\parskip=1em
+	The ``design by contract" approach prescribes that developers should define formal(?), precise(?) and verifiable(?) interface specifications for software components (functions, classes, modules, programs, etc). 
+	
+	The ``contract'' is the following: $P \land I \implies Q \land I$ ($\land$ side effects). Generally, $\lnot (P \land I)\implies \text{errors}$, but it is not necessarily true in all cases (and it does not have to be). 
+	
+	\textbf{Notice that this does not say how to get from $P\land I$ to $Q\land I$.} This is thus mostly useful for the programmer (and the user).
+	
+	\column{.5\linewidth}
+	\begin{center}
+		\begin{tikzpicture}
+			\draw[blue,fill=blue!15] (0, 0) rectangle +(4, 3);
+			\draw[blue]  (0, -.25) node[anchor=south west,rotate=90]{Software component};
+			\draw[-latex,very thick] (2, 3.5) node[above]{Preconditions ($P$)}-- +(0, -1);
+			\draw[-latex,very thick] (2, 0.5) node[above]{Postconditions  ($Q$)}-- +(0, -1);
+			\draw[-latex,very thick] (3.5, 2.25) -- +(1, 0) node[right]{Errors};
+			\draw[-latex,very thick] (3.5, 1.75) -- +(1, 0) node[right]{Side effects};
+			\draw (2, 2) node{Invariants ($I$)};
+		\end{tikzpicture}
+	\end{center}
+	\vspace*{1em}
+	+ Eventual performances guarantees.
+	\end{columns}
+\end{frame}
+
 \begin{frame}
-	Example: floating type numbers.
+	\vspace*{1em}
+	\begin{columns}
+		\column{.5\linewidth}
+		\begin{itemize}
+			\item The \textbf{preconditions} are predicates that must be true before the execution of the component (it generally boils down to the type of the inputs and their respective domains). It must be guaranteed by \textbf{the caller}. If a precondition is violated, the effect becomes undefined.
+			\item The \textbf{postconditions} are predicates that must be true after execution (if the preconditions are true), which is guaranteed by the \textbf{callee}.
+			\item The \textbf{invariants} are predicates that must be true before and after execution. This is guaranteed by the caller \textbf{and} the callee (but mostly the later).
+		\end{itemize}
+		
+		\column{.4\linewidth}
+		\begin{center}
+			\includegraphics[width=\linewidth]{im/meme-prepost}
+		\end{center}
+	\end{columns}
 \end{frame}
 
-\begin{frame}{Design by contract}
-	Pre/post-conditions. And invariant? (this is kind of important for ADT, the one for loops are less important).
-\end{frame}
-
-\begin{frame}{Data structures}
-Other example of abstract data types (list, queue, dictionary, etc).
-Note: don't forget $\mathcal O(N)$.
+\begin{frame}
+	Example (abs?) + Side effects + errors.
 \end{frame}
 
 \begin{frame}{Documentation}
+	docstring and generation?
 \end{frame}
 
 \begin{frame}{Testing}
@@ -132,6 +231,11 @@ Note: don't forget $\mathcal O(N)$.
 
 \begin{frame}{Error handling (\textit{exceptions})}
 	content...
+\end{frame}
+
+\begin{frame}{Data structures}
+Other example of abstract data types (list, queue, dictionary, etc).
+Note: don't forget $\mathcal O(N)$.
 \end{frame}
 
  \section{POO and POO in Python}
