@@ -97,15 +97,15 @@ aspectratio=169
 	\vspace{1em}
 \end{frame}
 
-\section{General concepts for programming}
-
 \begin{frame}{Note on the ``who''}
-	In this  part, I will distinguish three kinds of people:\begin{enumerate}
-		\item The \textbf{developers}, who actually develop the code/library and eventually provide an API (\textit{application programming interface}).
-		\item The \textbf{programmers}, who use the API provided by the code/library and develop on top of it.
-		\item The \textbf{users}, who use the program/executable, but do not program.
-	\end{enumerate}
+In the rest of this presentation, I will (sometimes) distinguish three kinds of people:\begin{enumerate}
+	\item The \textbf{developers}, who actually develop the code/library and eventually provide an API (\textit{application programming interface}).
+	\item The \textbf{programmers}, who use the API provided by the code/library and develop on top of it.
+	\item The \textbf{users}, who use the program/executable, but do not program.
+\end{enumerate}
 \end{frame}
+
+\section{It's all about abstraction}
 
 \begin{frame}{Abstractions}
 	A well-designed program should be \textbf{modular}, with each module having clear and specific responsibilities. They can then work together . One of the best ways to achieve this is through \textbf{abstraction}, which means focusing on what matters while ignoring unnecessary details. There are several levels of abstraction:
@@ -166,6 +166,8 @@ y = x - 3.25e-2
 	\end{minted}
 	This is a powerful abstraction!
 \end{frame}
+
+\section{Abstraction by specification}
 
 \begin{frame}{Design by contract (i.e., abstraction by specification)}
 	\vspace*{1em}
@@ -301,6 +303,58 @@ class Dog {
 	
 	Note: \url{https://docs.python.org/3/library/doctest.html}.
 \end{frame}
+\begin{frame}{Error handling (\textit{exceptions})}
+As mentioned above, there are two possible reasons for reporting an error:\begin{enumerate}
+	\item When the precondition is not fulfilled. Again, you should normally not check that, and thus, not report an error for that. However... This is still useful for the developer during implementation. Thus, \textbf{if checking (a part of) the precondition is cheap},\footnote{$\mathcal{O}(1)$, no more.} you can use \mintinline{python}|assert|, which is a function/statement available in many languages that is only compiled/interpreted in ``debug'' mode.\footnote{calling \texttt{python -O -c "assert false"} results in no error.}
+	\item When you want to avoid undefined behavior by weakening the preconditions and issuing errors instead.
+\end{enumerate}
+\end{frame}
+
+\begin{frame}[fragile]
+And there are two ways to report an error. One is to use the return value or mutate a global variable (or, on languages that allows it, mutate an input designated for that, like \texttt{ierror}):\begin{minted}{python}
+	def normalize(x: np.ndarray) -> int:
+	"""
+	pre: x is a vector
+	post: if return value is 0, x is normalized, if return value is 1, it is not.
+	"""
+	norm = np.linalg.norm(x)
+	if norm == 0:
+	return 1
+	x /= norm
+	return 0
+\end{minted}
+Although totally fine, this is a bit long. Also, the caller can ignore the return value,\footnote{Many bugs in old AND modern programs are due to non-checked return values when allocating memory.} which would in practice create an undefined behavior.
+\vspace{1em}
+\end{frame}
+
+\begin{frame}
+This is why many ``modern'' programming languages propose a mechanism called \textbf{exceptions}.  It works like this:\begin{itemize}
+	\item When an issue should be issued, the code \textbf{throw} an exception (which can be an integer, a string, or something more complex like and object which allows to provide context).
+	\item The execution propagate up in the call stack, to a point where the error can be handled. If there is none, the execution terminates badly.
+\end{itemize}
+This force the caller to handle the exception. It also effectively separate the code that detect the error and the one that handles it.
+\end{frame}
+
+\begin{frame}
+\begin{center}
+	{\LARGE DEMO TIME!}
+\end{center}
+\end{frame}
+
+\begin{frame}
+The take home message here is:\begin{itemize}
+	\item \mintinline{python}|assert| for the developers,
+	\item \mintinline{python}|throw| (+ documentation) for the programmers, and
+	\item a nice error message (eventually in \texttt{stderr}) for the users. The stacktrace frighten them.
+\end{itemize}
+
+
+And, by the way...
+
+\begin{center}
+	\includegraphics[width=.5\linewidth]{im/meme-goto}
+\end{center}
+\end{frame}
 
 \begin{frame}{Testing}
 	\begin{columns}
@@ -380,58 +434,8 @@ class Dog {
 \end{center}
 \end{frame}
 
-\begin{frame}{Error handling (\textit{exceptions})}
-	As mentioned above, there are two possible reasons for reporting an error:\begin{enumerate}
-		\item When the precondition is not fulfilled. Again, you should normally not check that, and thus, not report an error for that. However... This is still useful for the developer during implementation. Thus, \textbf{if checking (a part of) the precondition is cheap},\footnote{$\mathcal{O}(1)$, no more.} you can use \mintinline{python}|assert|, which is a function/statement available in many languages that is only compiled/interpreted in ``debug'' mode.\footnote{calling \texttt{python -O -c "assert false"} results in no error.}
-		\item When you want to avoid undefined behavior by weakening the preconditions and issuing errors instead.
-	\end{enumerate}
-\end{frame}
+\section{Data abstraction}
 
-\begin{frame}[fragile]
-	And there are two ways to report an error. One is to use the return value or mutate a global variable (or, on languages that allows it, mutate an input designated for that, like \texttt{ierror}):\begin{minted}{python}
-def normalize(x: np.ndarray) -> int:
-	"""
-	pre: x is a vector
-	post: if return value is 0, x is normalized, if return value is 1, it is not.
-	"""
-	norm = np.linalg.norm(x)
-	if norm == 0:
-		return 1
-	x /= norm
-	return 0
-	\end{minted}
-Although totally fine, this is a bit long. Also, the caller can ignore the return value,\footnote{Many bugs in old AND modern programs are due to non-checked return values when allocating memory.} which would in practice create an undefined behavior.
-\vspace{1em}
-\end{frame}
-
-\begin{frame}
-	This is why many ``modern'' programming languages propose a mechanism called \textbf{exceptions}.  It works like this:\begin{itemize}
-		\item When an issue should be issued, the code \textbf{throw} an exception (which can be an integer, a string, or something more complex like and object which allows to provide context).
-		\item The execution propagate up in the call stack, to a point where the error can be handled. If there is none, the execution terminates badly.
-	\end{itemize}
-	This force the caller to handle the exception. It also effectively separate the code that detect the error and the one that handles it.
-\end{frame}
-
-\begin{frame}
-	\begin{center}
-		{\LARGE DEMO TIME!}
-	\end{center}
-\end{frame}
-
-\begin{frame}
-	The take home message here is:\begin{itemize}
-		\item \mintinline{python}|assert| for the developers,
-		\item \mintinline{python}|throw| (+ documentation) for the programmers, and
-		\item a nice error message (eventually in \texttt{stderr}) for the users. The stacktrace frighten them.
-	\end{itemize}
-	
-	
-	And, by the way...
-	
-	\begin{center}
-		\includegraphics[width=.5\linewidth]{im/meme-goto}
-	\end{center}
-\end{frame}
 
 \newcommand{\Ox}[1]{\ensuremath{\mathcal{O}(#1)}}
 
@@ -449,7 +453,7 @@ $g(n)$ is generally taken as simple as possible, such as $1$, $\log_2 n$ (genera
 
 \begin{frame}[fragile]
 	Example:\begin{minted}{python}
-def find(a: list[int], v: int) -> int:
+def find1(a: list[int], v: int) -> int:
 	"""
 	Get the position of `v` in `a`.
 	
@@ -493,43 +497,139 @@ In the worst case scenario, the loop is executed $\log_2 n$ times, so $\Ox{\log 
 		\scriptsize
 		\begin{tabular}{l cccc c cccc}
 			\toprule
-			DS & \multicolumn{4}{c}{Average} & & \multicolumn{4}{c}{Worst} \\
+			Data & \multicolumn{4}{c}{Average time complexity} & & \multicolumn{4}{c}{Worst time complexity} \\
 			\cline{2-5} \cline{7-10}
-			& Access & Search & Insert & Delete && Access & Search & Insert & Delete \\
+			structure& Access & Search & Insert & Delete && Access & Search & Insert & Delete \\
 			\midrule
 			Array & \textcolor{green}{\Ox 1} & \textcolor{red}{\Ox n} & \textcolor{red}{\Ox n} & \textcolor{red}{\Ox n} && \textcolor{green}{\Ox 1} & \textcolor{red}{\Ox n} & \textcolor{red}{\Ox n} & \textcolor{red}{\Ox n} \\
 			List & \textcolor{red}{\Ox n} & \textcolor{red}{\Ox n} & \textcolor{green}{\Ox 1}  &\textcolor{green}{\Ox 1} && \textcolor{red}{\Ox n} & \textcolor{red}{\Ox n} & \textcolor{green}{\Ox 1}  &\textcolor{green}{\Ox 1}\\
 			BS-tree &  \textcolor{orange}{\Ox{\log n}}  &  \textcolor{orange}{\Ox{\log n}}  &  \textcolor{orange}{\Ox{\log n}}  &  \textcolor{orange}{\Ox{\log n}}  && \textcolor{red}{\Ox n} & \textcolor{red}{\Ox n} & \textcolor{red}{\Ox n} & \textcolor{red}{\Ox n} \\
 			(R)B-tree &  \textcolor{orange}{\Ox{\log n}}  &  \textcolor{orange}{\Ox{\log n}}  &  \textcolor{orange}{\Ox{\log n}}  &  \textcolor{orange}{\Ox{\log n}}  &  &  \textcolor{orange}{\Ox{\log n}}   &  \textcolor{orange}{\Ox{\log n}}  &  \textcolor{orange}{\Ox{\log n}}  & 
 	 \textcolor{orange}{\Ox{\log n}}\\
-	 Hash Table & --- & \textcolor{green}{\Ox 1} & \textcolor{green}{\Ox 1} & \textcolor{green}{\Ox 1} && - & \textcolor{red}{\Ox n} & \textcolor{red}{\Ox n} & \textcolor{red}{\Ox n} \\
+	 Hash Table & --- & \textcolor{green}{\Ox 1} & \textcolor{green}{\Ox 1} & \textcolor{green}{\Ox 1} && --- & \textcolor{red}{\Ox n} & \textcolor{red}{\Ox n} & \textcolor{red}{\Ox n} \\
 	 \bottomrule
 		\end{tabular}
 		\caption{Data structure operation costs, from \url{https://www.bigocheatsheet.com/}.}
 	\end{table}
 	Notes:\begin{itemize}
+		\item In practice, nobody care how its implemented.
 		\item All these structure have $\mathcal{O}(n)$ space complexity.
 		\item Stack, Queue, List, etc are generally implemented as singly/doubled linked lists.
 		\item Hash tables (dictionary) are generally a combination of an array (for which the hash function give the key) and some sort of list or tree to solve collisions.
 		\item The \mintinline{python}|set| (and \mintinline{python}|frozenset|?) is implemented as a hash table.
+		\item See below for BS (binary search) tree.
 	\end{itemize}
 \end{frame}
-
- \section{POO and POO in Python}
  
- \begin{frame}{What is POO?}
- 	\begin{itemize}
- 		\item ADT (and internal representation. Example: a molecule and its atoms.
- 		\item Methods (CRUDs)  + encapsulation (private/public?).
- 		\item Also, the invariant of the binary tree, because it is easy to understand.
- 		\item Instance of a \textbf{class} + methods.
- 	\end{itemize}
+ \begin{frame}[fragile]{Oriented object programming (OOP)}
+ 	
+ 	The goal of OOP is to define new \textbf{abstract data types} (ADT), \textit{i.e.}, separate the concrete representation of the data and their (abstract) signification. For example, a \textit{molecule} (not that you should not define members like this):\begin{columns}
+ 		\column[t]{.25\linewidth}
+ 		\begin{minted}{python}
+class Atom:
+  symbol: str
+  coordinates: list[float]
+ 	
+class Molecule:
+  atoms: list[Atom]
+ 		\end{minted}
+ 		\column[t]{.25\linewidth}
+ 		\begin{minted}{python}
+class Molecule:
+	symbols: list[str]
+	positions: np.ndarray
+ 		\end{minted}
+ 		\column[t]{.25\linewidth}
+\begin{minted}{python}
+class Atom:
+	symbol: str
+	coordinates: list[float]
+
+class Molecule:
+	atoms: SearchTree[Atom]
+\end{minted}
+ 	\end{columns}
+In all three cases, although the \textbf{internal representation} (irep) of the molecule change, its behavior should not! And the programmer should not knwow  (or care) about what is inside.
  \end{frame}
  
- \section{Organization of a (Python) project}
+\begin{frame}
+	So, what do you need to do OOP?\begin{itemize}
+		\item The \textbf{need} for an ADT (it is more frequent than you think!).
+		\item An (abstract) \textbf{specification}: what your ADT is suppose to do? (again, focus on ``what'', not ``how''). This may include an \textbf{ADT invariant} (AI), something that should be true during the lifetime of an instance of the ADT.
+		\item \textbf{The specification the methods}: these methods provides ways to interact with your ADT: normally, the programmer should never directly interact with your irep.\footnote{This is called \textbf{encapsulation}. Python is rather permissive here.} Furthemore,  no method should break the ADT invariant! 
+		\item \textbf{An irep}: it should be chosen so that it allow you to  implements all specified methods. A useful tool in there is the definition of a \textbf{representation invariant} (RI), which translates the ADT invariant in concrete code. 
+	\end{itemize}
+	In python (and in other languages), an ADT is implemented via a \mintinline{python}|class|. Then, in the rest of the code, you \textbf{instanciate} your ADT and interact with these instances with the methods that where defined in the \mintinline{python}|class|.
+	\vspace{1em}
+\end{frame}
+
+\begin{frame}
+	\vspace{1em}
+	\begin{columns}
+	\column{.6\linewidth}
+	(textbook) example: a \textbf{binary search (BS) tree}:\begin{itemize}
+		\item The \textbf{need}: yes. Data are automatically sorted as a result!
+		\item An (abstract) \textbf{specification}:  a binary search tree is a tree that allow binary search for fast lookup, addition, and removal of data items (here, integers). Each node of the tree has (at most) two children, the \textit{left} and the \textit{right}. The ADT invariant is the following: ``each node is greater than all the ones in its left subtree and less than the ones in its right subtree''.
+		\item \textbf{The specification the methods}: at least \mintinline{python}|insert(k: int)|, \mintinline{python}|delete(k: int)|,  and \mintinline{python}|search(k: int)|.
+		\item \textbf{An irep}: linked lists would do, but funny implementations exists with arrays.
+	\end{itemize}
+	\column{.4\linewidth}
+	\begin{center}
+		\begin{tikzpicture}[node distance=.75cm]
+			\node[circle,draw,thick] (r8) {8};
+			\node[circle,draw,below left=of r8] (r3) {3};
+			\node[circle,draw,below right=of r8] (r10) {10};
+			\node[circle,draw,below right=of r10] (r14) {14};
+			\node[circle,draw,below left=of r14] (r13) {13};
+			\node[circle,draw,below left=of r3] (r1) {1};
+			\node[circle,draw,below right=of r3] (r6) {6};
+			\draw[-latex] (r8) -- (r10);
+			\draw[-latex] (r8) -- (r3);
+			\draw[-latex] (r3) -- (r6);
+			\draw[-latex] (r3) -- (r1);
+			\draw[-latex] (r10) -- (r14);
+			\draw[-latex] (r14) -- (r13);
+		\end{tikzpicture}
+	\end{center}
+	Questions: how to perform:\begin{enumerate}
+		\item \mintinline{python}|search(6)|, or
+		\item \mintinline{python}|insert(12)|, or
+		\item \mintinline{python}|delete(8)|,
+	\end{enumerate}
+	in order to keep the invariant valid? And in the second case, what is the complexity?
+\end{columns}
+\end{frame}
+
+\begin{frame}
+	Useful methods:\begin{itemize}
+		\item \textbf{Creators} (including, but not limited to, \textit{constructors}): allow to create instances of your ADT out of nowhere.
+		\item \textbf{Producers}: create new instance from existing one(s). Particularly useful for \textbf{immutable} ADT, but you need to take care of the copy of your irep.\footnote{Shallow versus deep copy.}
+		\item \textbf{Modifiers} (also called \textit{setters}): modifies the instance directly.
+		\item \textbf{Observers} (also called \textit{getters}): provide access to properties of the instance.
+	\end{itemize}
+	A similar nomenclature is CRUD (create, read, update, delete\footnote{There is no deleter in Python.}). Python also have \textit{magic} methods, \mintinline{python}|__func__()| which, if you define them, allow to use syntaxic sugar with your ADT (\textit{e.g.}, \mintinline{python}|x = A(); y = A(); z = x + y|). One of them is the \textit{constructor}.
+\end{frame}
+
+\begin{frame}{Hierarchy of type (i.e., inheritance)}
+	The \textbf{specialization} of an ADT is possible via a mechanism called inheritance.\footnote{Other mechanism, like composition/traits, are possible, see \url{https://en.wikipedia.org/wiki/Composition_over_inheritance}.} The rule being, theoretically, that ``\emph{if \texttt{S} is a subtype of \texttt{T}, \texttt{S} can be used anywhere where \texttt{T} is used}''.\footnote{This is known as the \textit{Liskov substitution principle} and this is... Debated.}
+	
+	In practice, given a parent class,  a children class inherit all its parents methods, as well as its invariants (which it should not break) and irep (which it should normally not access directly). It can however re-implement (\textit{override}) some of the parent methods (but should keep their signature!) as well as add new ones.
+	
+	It is also possible in certain language to define \textbf{interfaces}, that only provide specifications, not actual implementation. This is useful in the case of a base ADT that can be extended in many different ways.
+\end{frame}
+
+\begin{frame}
+\begin{center}
+	{\LARGE DEMO TIME!}
+\end{center}
+\end{frame}
+
+ \section{A few Python's specifics}
  
  \begin{frame}
  	\begin{itemize}
+ 		 \item \url{https://en.wikipedia.org/wiki/Duck_typing} (``an object is of a given type if it has (all) the methods of that type'')
+ 		 \item The zen of python?
  		\item typing and linting
  		\item Use git
  		\item Don't reinvent the wheel (\textit{battery (already) included})
