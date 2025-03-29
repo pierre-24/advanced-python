@@ -8,6 +8,7 @@ aspectratio=169
 
 \usepackage{nicefrac}
 \usepackage{braket}
+\usepackage{booktabs}
 
 %\usepackage[backend=biber,style=chem-acs]{biblatex}
 %\bibliography{biblio}
@@ -217,7 +218,7 @@ def _abs(x: float) -> float:
 	return -x if x < 0 else x  # note: that's called syntaxic sugar
 	\end{minted}
 	Here, $sp(\underline{S}, P \land I) \implies Q \land I$, so this program is valid. Indeed, \begin{align*}
-		Q' &= sp(\text{\mintinline{python}|-x if x < 0 else x|}, x\in\mathbb{R}) \\
+		Q' &= sp(\text{\mintinline{python}|return -x if x < 0 else x|}, x\in\mathbb{R}) \\
 		&= (\mathcal{R} = -x \land x < 0 \land x\in\mathbb{R}) \lor (\mathcal{R} = x \land x \geq 0 \land x\in\mathbb{R})\\
 		&= [(\mathcal{R} = -x \land x < 0) \lor (\mathcal{R} = x \land x \geq 0)]  \land x\in\mathbb{R}
 	\end{align*}
@@ -247,7 +248,15 @@ def _abs(x: float) -> float:
 	The goal is therefore to provide a ``framework" for things you should document, rather than a set of rules.
 \end{frame}
 
-\begin{frame}{Documentation}
+\begin{frame}
+	Caution:
+\begin{center}
+	{\LARGE \textit{Programming by contract} assume that \textbf{everyone} write, read, understand, and follow the specifications.}
+\end{center}
+That's rarely the case in amateur projects (including some of mine, by the way).
+\end{frame}
+
+\begin{frame}{Documentation(s?)}
 	\begin{itemize}
 		\item The documentation is therefore the place where you indicate your pre/post-conditions, side effects, etc. Note that these concepts applies to any component you can think of (even a CLI program has inputs and outputs), although with different names. Again, ``framework'' rather than set of rules.
 		\item Be nice to your programmers/users: details the installation procedure as much as possible (detail the dependencies if any), provide examples,\footnote{... But an example alone is not a good documentation, thought.} etc. We all have in mind good and bad documentation... Let's not be an example of the latter ;)
@@ -424,9 +433,86 @@ Although totally fine, this is a bit long. Also, the caller can ignore the retur
 	\end{center}
 \end{frame}
 
+\newcommand{\Ox}[1]{\ensuremath{\mathcal{O}(#1)}}
+
 \begin{frame}{Data structures}
-Other example of abstract data types (list, queue, dictionary, etc).
-Note: don't forget $\mathcal O(N)$. See \url{https://www.bigocheatsheet.com/}.
+The idea behind common data structures (list, arrays, dictionary, sets, etc) is to provide efficient ways to store and retrieve data depending on the problem you want to solve.
+
+To measure the efficiency, one measures the \textbf{computational complexity} of different tasks, defined as:\begin{equation*}
+	T(n) = \mathcal{O}(g(n))  \text{ as } n\to\infty \implies \exists M, n_0\in\mathbb{N}^+: \forall n\geq n_0: |T(n)| \leq M |g(n)|,
+\end{equation*}
+where $T(n)$ is the function that measure the execution time of a given piece of code (generally a function) given an input of size $n$. In a sense, the big-$\mathcal{O}$ refers to the asymptotic behavior of $T(n)$ (and is thus also found when speaking about finite series). 
+
+$g(n)$ is generally taken as simple as possible, such as $1$, $\log_2 n$ (generally written $\log n$), $n$, etc.
+\end{frame}
+
+
+\begin{frame}[fragile]
+	Example:\begin{minted}{python}
+def find(a: list[int], v: int) -> int:
+	"""
+	Get the position of `v` in `a`.
+	
+	pre: `a` is a list of integers, `v` is an integer.
+	post: if it exists in `a`, the index of `v` is returned if in `a`. A negative value is returned otherwise.
+	"""
+	for i in range(len(a)): 
+		if a[i] == v:
+			return i 
+	return -1   # note: postcondition is less strict than actual implementation
+	\end{minted}
+In the worst case scenario (\mintinline{python}|v| is not in \mintinline{python}|a|), the loop is executed $n$ times, where $n$ is the size of \mintinline{python}|a|. This algorithm is thus $\Ox n$.
+\end{frame}
+
+\begin{frame}[fragile]
+\begin{minted}{python}
+def find2(a: list[int], v: int) -> int:
+	"""
+	Get the position of `v` in `a`.
+	
+	pre: `a` is a **sorted** list of integers, `v` is an integer.
+	post: if it exists in `a`, the index of `v` is returned if in `a`. A negative value is returned otherwise.
+	"""
+	b, e = 0, len(a) - 1
+	while e >= b:  # note: T(n) = 1 + T(n/2)
+		p = (e + b) // 2  # note: integer division
+		if a[p] == v:
+			return p
+		elif a[p] > v:
+			e = p - 1    # then it's left
+		else:
+			b = p + 1   # then it's right
+	return -1
+\end{minted}
+In the worst case scenario, the loop is executed $\log_2 n$ times, so $\Ox{\log n}$.
+\end{frame}
+
+\begin{frame}
+	In a nutshell:
+	\begin{table}
+		\scriptsize
+		\begin{tabular}{l cccc c cccc}
+			\toprule
+			DS & \multicolumn{4}{c}{Average} & & \multicolumn{4}{c}{Worst} \\
+			\cline{2-5} \cline{7-10}
+			& Access & Search & Insert & Delete && Access & Search & Insert & Delete \\
+			\midrule
+			Array & \textcolor{green}{\Ox 1} & \textcolor{red}{\Ox n} & \textcolor{red}{\Ox n} & \textcolor{red}{\Ox n} && \textcolor{green}{\Ox 1} & \textcolor{red}{\Ox n} & \textcolor{red}{\Ox n} & \textcolor{red}{\Ox n} \\
+			List & \textcolor{red}{\Ox n} & \textcolor{red}{\Ox n} & \textcolor{green}{\Ox 1}  &\textcolor{green}{\Ox 1} && \textcolor{red}{\Ox n} & \textcolor{red}{\Ox n} & \textcolor{green}{\Ox 1}  &\textcolor{green}{\Ox 1}\\
+			BS-tree &  \textcolor{orange}{\Ox{\log n}}  &  \textcolor{orange}{\Ox{\log n}}  &  \textcolor{orange}{\Ox{\log n}}  &  \textcolor{orange}{\Ox{\log n}}  && \textcolor{red}{\Ox n} & \textcolor{red}{\Ox n} & \textcolor{red}{\Ox n} & \textcolor{red}{\Ox n} \\
+			(R)B-tree &  \textcolor{orange}{\Ox{\log n}}  &  \textcolor{orange}{\Ox{\log n}}  &  \textcolor{orange}{\Ox{\log n}}  &  \textcolor{orange}{\Ox{\log n}}  &  &  \textcolor{orange}{\Ox{\log n}}   &  \textcolor{orange}{\Ox{\log n}}  &  \textcolor{orange}{\Ox{\log n}}  & 
+	 \textcolor{orange}{\Ox{\log n}}\\
+	 Hash Table & --- & \textcolor{green}{\Ox 1} & \textcolor{green}{\Ox 1} & \textcolor{green}{\Ox 1} && - & \textcolor{red}{\Ox n} & \textcolor{red}{\Ox n} & \textcolor{red}{\Ox n} \\
+	 \bottomrule
+		\end{tabular}
+		\caption{Data structure operation costs, from \url{https://www.bigocheatsheet.com/}.}
+	\end{table}
+	Notes:\begin{itemize}
+		\item All these structure have $\mathcal{O}(n)$ space complexity.
+		\item Stack, Queue, List, etc are generally implemented as singly/doubled linked lists.
+		\item Hash tables (dictionary) are generally a combination of an array (for which the hash function give the key) and some sort of list or tree to solve collisions.
+		\item The \mintinline{python}|set| (and \mintinline{python}|frozenset|?) is implemented as a hash table.
+	\end{itemize}
 \end{frame}
 
  \section{POO and POO in Python}
@@ -435,6 +521,7 @@ Note: don't forget $\mathcal O(N)$. See \url{https://www.bigocheatsheet.com/}.
  	\begin{itemize}
  		\item ADT (and internal representation. Example: a molecule and its atoms.
  		\item Methods (CRUDs)  + encapsulation (private/public?).
+ 		\item Also, the invariant of the binary tree, because it is easy to understand.
  		\item Instance of a \textbf{class} + methods.
  	\end{itemize}
  \end{frame}
