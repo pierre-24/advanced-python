@@ -301,8 +301,7 @@ class Dog {
 	\end{center}
 	
 	\begin{itemize}
-		\item \mintinline{python}|pytest| basics (create and run)
-		\item fixtures
+		\item Sphinx
 		\item \mintinline{bash}|python -m doctest -v neighbour_search/*.py|
 	\end{itemize}
 \end{frame}
@@ -434,6 +433,11 @@ And, by the way...
 \begin{frame}
 \begin{center}
 	{\LARGE DEMO TIME!}
+	
+	\begin{itemize}
+		\item \mintinline{python}|pytest| basics (create and run)
+		\item fixtures
+	\end{itemize}
 \end{center}
 \end{frame}
 
@@ -610,7 +614,7 @@ In all three cases, although the \textbf{internal representation} (irep) of the 
 		\item \textbf{Modifiers} (also called \textit{setters}): modifies the instance directly.
 		\item \textbf{Observers} (also called \textit{getters}): provide access to properties of the instance.
 	\end{itemize}
-	A similar nomenclature is CRUD (create, read, update, delete\footnote{There is no deleter in Python.}). Python also have \textit{magic} methods, \mintinline{python}|__func__()| which, if you define them, allow to use syntaxic sugar with your ADT (\textit{e.g.}, \mintinline{python}|x = A(); y = A(); z = x + y|). One of them is the \textit{constructor}.
+	A similar nomenclature is CRUD (create, read, update, delete\footnote{There is no deleter in Python.}). Python also have \textit{magic} methods,\footnote{See \url{https://docs.python.org/3/reference/datamodel.html\#special-method-names}} \mintinline{python}|__func__()| which, if you define them, allow to use syntaxic sugar with your ADT (\textit{e.g.}, \mintinline{python}|x = A(); y = A(); z = x + y|). One of them is the \textit{constructor}.
 \end{frame}
 
 \begin{frame}{Hierarchy of type (i.e., inheritance)}

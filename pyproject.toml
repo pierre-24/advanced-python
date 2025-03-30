@@ -23,16 +23,17 @@ classifiers = [
 
 dependencies = [
     'numpy',
+    'matplotlib',
 ]
 
 [project.optional-dependencies]
 dev = [
-    "flake8",
-    "flake8-quotes",
-    "autopep8",
-    "pytest",
-    "sphinx",
-    "sphinx-book-theme",
+    'flake8',
+    'flake8-quotes',
+    'autopep8',
+    'pytest',
+    'sphinx',
+    'sphinx-book-theme',
 ]
 
 [project.scripts]
