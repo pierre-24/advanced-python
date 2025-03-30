@@ -30,9 +30,9 @@ class NaiveNeighbourSearch(AbstractNeighbourSearch):
         # get the `k` first ones
         return [queue.pop() for _ in range(k)]
 
-    def ball_search(self, position: np.ndarray[float], radius: float) -> list[int]:
+    def ball_search(self, position: np.ndarray[float], distance: float) -> list[int]:
         # check preconditions
-        assert radius >= 0
+        assert distance >= 0
 
         # create queue
         queue = []
@@ -40,7 +40,7 @@ class NaiveNeighbourSearch(AbstractNeighbourSearch):
         # put item in queue
         for i, p in enumerate(self.positions):
             d = (p[0] - position[0]) ** 2 + (p[1] - position[1]) ** 2
-            if d < radius ** 2:
+            if d <= distance ** 2:
                 queue.append(i)
 
         # return the result

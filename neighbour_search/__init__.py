@@ -55,12 +55,12 @@ class AbstractNeighbourSearch:
         """
         self.positions = positions
 
-    def ball_search(self, position: np.ndarray[float], radius: float) -> list[int]:
-        """Get the points that are below a `radius` distance from `position`.
+    def ball_search(self, position: np.ndarray[float], distance: float) -> list[int]:
+        """Get the points that are below or equal to a `distance` from `position`.
 
         Args:
             position: A (2,) array
-            radius: distance from `position` at which point will be selected, should be >0
+            distance: distance from `position` at which point will be selected, should be >0
         Returns:
             A list of indices, the points that are at a `radius` distance from `position`.
         """
