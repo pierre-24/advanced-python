@@ -30,7 +30,9 @@ dev = [
     "flake8",
     "flake8-quotes",
     "autopep8",
-    "pytest"
+    "pytest",
+    "sphinx",
+    "sphinx-book-theme",
 ]
 
 [project.scripts]

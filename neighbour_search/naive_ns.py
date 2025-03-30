@@ -1,3 +1,10 @@
+"""
+Naive neighbour search implementation.
+
++ It uses the ``PriorityQueue`` in ``knn_search()``, which is therefore :math:`\\mathcal{O}(n\\log(n))`.
++ It simply loops through all positions for ``ball_search()``, which is :math:`\\mathcal{O}(n)`.
+"""
+
 import numpy as np
 
 from neighbour_search import AbstractNeighbourSearch, PriorityQueue
@@ -7,7 +14,14 @@ class NaiveNeighbourSearch(AbstractNeighbourSearch):
     """
     A "naive" implementation.
 
-    `knn_search` is $\\mathcal{O}(n\\log(n))$, `ball_search` is $\\mathcal{O}(n)$.
+    Example:
+        >>> import numpy as np
+        >>> from neighbour_search.naive_ns import NaiveNeighbourSearch as NeighbourSearch
+        >>> neighbour_search = NeighbourSearch(np.array([[0, 0], [1, 1]]))
+        >>> neighbour_search.knn_search(0, 1)
+        [1]
+        >>> neighbour_search.ball_search(np.array([0, 0]), 5)
+        [0, 1]
     """
 
     def knn_search(self, target: int, k: int) -> list[int]:
@@ -27,7 +41,7 @@ class NaiveNeighbourSearch(AbstractNeighbourSearch):
             d = (p[0] - tp[0]) ** 2 + (p[1] - tp[1]) ** 2
             queue.put(i, d)
 
-        # get the `k` first ones
+        # get the ``k`` first ones
         return [queue.pop() for _ in range(k)]
 
     def ball_search(self, position: np.ndarray[float], distance: float) -> list[int]:
