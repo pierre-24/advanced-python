@@ -11,16 +11,29 @@ __version__ = '0.1.0'
 class PriorityQueue:
     """Define a priority queue, which store items by priority.
 
-    Invariant: the items are sorted by priority, from low to high.
+    Invariant:
+        The first element of the queue is the one with the lowest priority.
+
+    Example:
+        >>> from neighbour_search import PriorityQueue
+        >>> pq = PriorityQueue()
+        >>> pq.push('a', 5)
+        >>> pq.push('b', 3)
+        >>> pq.push('c', 2)
+        >>> pq.push('d', 7)
+        >>> pq.pop()
+        'c'
+        >>> pq.pop()
+        'b'
     """
 
     def __init__(self):
-        """Create a new empty priority queue
+        """Create a new (empty) priority queue
         """
-        self.queue = []
+        self.queue: list[int | float] = []
 
-    def put(self, item: object, priority: int):
-        """Put an item into the queue, with a given priority.
+    def push(self, item: object, priority: int | float):
+        """Push an item into the queue, with a given priority.
 
         Args:
             item: item
@@ -30,7 +43,7 @@ class PriorityQueue:
 
     def pop(self):
         """
-        Pop the item with the lowest priority.
+        Pop the first item (the one with the lowest priority).
 
         Raises:
              KeyError: if empty.
@@ -44,7 +57,10 @@ class PriorityQueue:
 class AbstractNeighbourSearch:
     """
     Define a data Structure that stores a list of 2D points, and provide ways to find neighbours.
-    This is an abstract base class, which does not implement ``knn_search()`` nor ``ball_search()``.
+
+    .. note::
+
+       This is an abstract base class, which does not implement ``knn_search()`` nor ``ball_search()``.
     """
 
     def __init__(self, positions: np.ndarray[float]):
@@ -72,10 +88,10 @@ class AbstractNeighbourSearch:
         """Find the ``k`` nearest neighbours of point ``target``.
 
         Args:
-            target: a valid index, ``0 <= target < len(self)``.
-            k: number of neighbours to return. ``0 <= k < len(self)``.
+            target: a valid index, so ``0 <= target < len(self)``.
+            k: number of neighbours to return, so ``0 <= k < len(self)``.
         Returns:
-            a list of indices, the ``k`` nearest neighbours of point ``point_index``.
+            a list of indices, the ``k`` nearest neighbours of ``target``.
         """
 
         raise NotImplementedError()

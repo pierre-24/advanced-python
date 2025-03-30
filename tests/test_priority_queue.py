@@ -8,9 +8,9 @@ def test_ordered_ok():
     # setup
     pq = PriorityQueue()
     # stimuli
-    pq.put(1, 1)
-    pq.put(2, 2)
-    pq.put(3, 3)
+    pq.push(1, 1)
+    pq.push(2, 2)
+    pq.push(3, 3)
     # verify
     assert pq.pop() == 1
     assert pq.pop() == 2
@@ -23,9 +23,9 @@ def test_reversed_ok():
     # setup
     pq = PriorityQueue()
     # stimuli
-    pq.put(3, 3)
-    pq.put(2, 2)
-    pq.put(1, 1)
+    pq.push(3, 3)
+    pq.push(2, 2)
+    pq.push(1, 1)
     # verify
     assert pq.pop() == 1
     assert pq.pop() == 2
@@ -47,7 +47,7 @@ def test_shuffled_ok(shuffled_priority_list):
     pq = PriorityQueue()
     # stimuli
     for item, priority in shuffled_priority_list:
-        pq.put(item, priority)
+        pq.push(item, priority)
     # verify
     assert pq.pop() == 0
     # teardown

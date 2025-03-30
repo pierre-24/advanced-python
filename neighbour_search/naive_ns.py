@@ -1,6 +1,7 @@
 """
 Naive neighbour search implementation.
 
++ Creation is :math:`\\mathcal{O}(1)`.
 + It uses the ``PriorityQueue`` in ``knn_search()``, which is therefore :math:`\\mathcal{O}(n\\log(n))`.
 + It simply loops through all positions for ``ball_search()``, which is :math:`\\mathcal{O}(n)`.
 """
@@ -39,7 +40,7 @@ class NaiveNeighbourSearch(AbstractNeighbourSearch):
                 continue
 
             d = (p[0] - tp[0]) ** 2 + (p[1] - tp[1]) ** 2
-            queue.put(i, d)
+            queue.push(i, d)
 
         # get the ``k`` first ones
         return [queue.pop() for _ in range(k)]
