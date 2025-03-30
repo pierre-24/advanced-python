@@ -1,0 +1,43 @@
+[project]
+name = "neighbour_search"
+dynamic = ["version"]
+
+authors = [
+    {name = "Pierre Beaujean", email = "pierre.beaujean@unamur.be"},
+]
+
+description = "An example package implementing neighbour search to demonstrate good practice in Python"
+
+readme = "README.md"
+
+requires-python = ">=3.12"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+]
+
+dependencies = [
+    'numpy',
+]
+
+[project.optional-dependencies]
+dev = [
+    "flake8",
+    "flake8-quotes",
+    "autopep8",
+    "pytest"
+]
+
+[project.scripts]
+
+[tool.setuptools]
+packages = ["neighbour_search"]
+
+[tool.setuptools.dynamic]
+version = {attr = "neighbour_search.__version__"}
+

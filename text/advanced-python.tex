@@ -125,13 +125,12 @@ In the rest of this presentation, I will (sometimes) distinguish three kinds of 
 print('perimeter of circle is', 2 * 3.141592 * 3.5)
 print('area is', 3.141592 * 3.5 ** 2)
 # abstraction by parameterization
-PI = 3.141592
+from math import pi as PI
+
 r = 3.5
 print('perimeter of circle is', 2 * PI * r)
 print('area is', PI * r ** 2)
 # abstraction by procedure
-from math import pi as PI
-
 def info_circle(r: float) -> None:
 	print('perimeter of circle is', 2 * PI * r)
 	print('area is', PI * r ** 2)
@@ -556,7 +555,7 @@ In all three cases, although the \textbf{internal representation} (irep) of the 
 	So, what do you need to do OOP?\begin{itemize}
 		\item The \textbf{need} for an ADT (it is more frequent than you think!).
 		\item An (abstract) \textbf{specification}: what your ADT is suppose to do? (again, focus on ``what'', not ``how''). This may include an \textbf{ADT invariant} (AI), something that should be true during the lifetime of an instance of the ADT.
-		\item \textbf{The specification the methods}: these methods provides ways to interact with your ADT: normally, the programmer should never directly interact with your irep.\footnote{This is called \textbf{encapsulation}. Python is rather permissive here.} Furthemore,  no method should break the ADT invariant! 
+		\item \textbf{The specification the methods}: these methods provides ways to interact with your ADT: normally, the programmer should never directly interact with your irep.\footnote{This is called \textbf{encapsulation}. Python is rather permissive here.} Furthemore,  no method should break the AI! 
 		\item \textbf{An irep}: it should be chosen so that it allow you to  implements all specified methods. A useful tool in there is the definition of a \textbf{representation invariant} (RI), which translates the ADT invariant in concrete code. 
 	\end{itemize}
 	In python (and in other languages), an ADT is implemented via a \mintinline{python}|class|. Then, in the rest of the code, you \textbf{instanciate} your ADT and interact with these instances with the methods that where defined in the \mintinline{python}|class|.
@@ -569,8 +568,8 @@ In all three cases, although the \textbf{internal representation} (irep) of the 
 	\column{.6\linewidth}
 	(textbook) example: a \textbf{binary search (BS) tree}:\begin{itemize}
 		\item The \textbf{need}: yes. Data are automatically sorted as a result!
-		\item An (abstract) \textbf{specification}:  a binary search tree is a tree that allow binary search for fast lookup, addition, and removal of data items (here, integers). Each node of the tree has (at most) two children, the \textit{left} and the \textit{right}. The ADT invariant is the following: ``each node is greater than all the ones in its left subtree and less than the ones in its right subtree''.
-		\item \textbf{The specification the methods}: at least \mintinline{python}|insert(k: int)|, \mintinline{python}|delete(k: int)|,  and \mintinline{python}|search(k: int)|.
+		\item An (abstract) \textbf{specification}:  a binary search tree is a tree that allow binary search for fast lookup, addition, and removal of data items (here, integers). Each node of the tree has (at most) two children, the \textit{left} and the \textit{right}. The AI  is the following: ``each node is greater than all the ones in its left subtree and less than the ones in its right subtree''.
+		\item \textbf{The specification the methods}: one needs at least \mintinline{python}|insert(k: int)|, \mintinline{python}|delete(k: int)|,  and \mintinline{python}|search(k: int)|.
 		\item \textbf{An irep}: linked lists would do, but funny implementations exists with arrays.
 	\end{itemize}
 	\column{.4\linewidth}
@@ -596,7 +595,7 @@ In all three cases, although the \textbf{internal representation} (irep) of the 
 		\item \mintinline{python}|insert(12)|, or
 		\item \mintinline{python}|delete(8)|,
 	\end{enumerate}
-	in order to keep the invariant valid? And in the second case, what is the complexity?
+	in order to keep the AI valid? And in the second case, what is the complexity?
 \end{columns}
 \end{frame}
 
