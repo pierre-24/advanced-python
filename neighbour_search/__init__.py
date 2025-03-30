@@ -30,7 +30,7 @@ class PriorityQueue:
     def __init__(self):
         """Create a new (empty) priority queue
         """
-        self.queue: list[int | float] = []
+        self.queue: list = []
 
     def push(self, item: object, priority: int | float):
         """Push an item into the queue, with a given priority.
@@ -52,6 +52,9 @@ class PriorityQueue:
             raise IndexError('Priority queue is empty')
 
         return heapq.heappop(self.queue)[1]
+
+    def __len__(self) -> int:
+        return len(self.queue)
 
 
 class AbstractNeighbourSearch:
@@ -77,7 +80,7 @@ class AbstractNeighbourSearch:
 
         Args:
             position: A (2,) array
-            distance: distance from ``position`` at which point will be selected, should be >0
+            distance: distance from ``position`` at which point will be selected, should be >= 0
         Returns:
             A list of indices, the points that are at a ``radius`` distance from ``position``.
         """

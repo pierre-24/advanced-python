@@ -39,3 +39,11 @@ Naive implementation
    :members:
    :show-inheritance:
    :undoc-members:
+
+k-d tree implementation
++++++++++++++++++++++++
+
+.. automodule:: neighbour_search.kdtree_ns
+   :members:
+   :show-inheritance:
+   :undoc-members:

@@ -8,7 +8,7 @@ def five_close_points():
     Return 5 points that are all contained in [-1,1] x [-1,1].
     """
 
-    center = np.random.random(2)
+    center = np.random.random(2) - [0.5, 0.5]
 
     return np.array([
         center + [.2, 0],

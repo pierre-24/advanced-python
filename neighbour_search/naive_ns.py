@@ -2,7 +2,7 @@
 Naive neighbour search implementation.
 
 + Creation is :math:`\\mathcal{O}(1)`.
-+ It uses the ``PriorityQueue`` in ``knn_search()``, which is therefore :math:`\\mathcal{O}(n\\log(n))`.
++ It uses the ``PriorityQueue`` in ``knn_search()``, which is therefore :math:`\\mathcal{O}(n\\log n)`.
 + It simply loops through all positions for ``ball_search()``, which is :math:`\\mathcal{O}(n)`.
 """
 
