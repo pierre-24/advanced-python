@@ -45,7 +45,7 @@ class NaiveNeighbourSearch(AbstractNeighbourSearch):
         # get the ``k`` first ones
         return [queue.pop() for _ in range(k)]
 
-    def ball_search(self, position: np.ndarray[float], distance: float) -> list[int]:
+    def ball_search(self, position: np.typing.NDArray, distance: float) -> list[int]:
         # check preconditions
         assert distance >= 0
 

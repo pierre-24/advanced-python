@@ -66,7 +66,7 @@ class AbstractNeighbourSearch:
        This is an abstract base class, which does not implement ``knn_search()`` nor ``ball_search()``.
     """
 
-    def __init__(self, positions: np.ndarray[float]):
+    def __init__(self, positions: np.typing.NDArray):
         """
         Create a new neighbour search object.
 
@@ -75,7 +75,7 @@ class AbstractNeighbourSearch:
         """
         self.positions = positions
 
-    def ball_search(self, position: np.ndarray[float], distance: float) -> list[int]:
+    def ball_search(self, position: np.typing.NDArray, distance: float) -> list[int]:
         """Get the points that are below or equal to a ``distance`` from ``position``.
 
         Args:

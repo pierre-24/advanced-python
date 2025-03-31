@@ -7,7 +7,10 @@ flake8:
 doctest:
 	python -m doctest -v neighbour_search/*.py
 
-lint: flake8 doctest
+mypy:
+	mypy neighbour_search/*.py tests/*.py
+
+lint: flake8 doctest mypy
 
 test:
 	pytest tests

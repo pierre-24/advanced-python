@@ -30,7 +30,7 @@ class KDTreeLeaf:
     def __len__(self) -> int:
         return len(self.points)
 
-    def ball_search(self, position: np.ndarray[float], distance: float) -> list[int]:
+    def ball_search(self, position: np.typing.NDArray, distance: float) -> list[int]:
         """Get the points that are below or equal to a ``distance`` from ``position`` within this leaf.
 
         Args:
@@ -52,7 +52,7 @@ class KDTreeLeaf:
         # return the result
         return queue
 
-    def knn_search(self, target_position: np.ndarray[float], k: int, queue: PriorityQueue) -> None:
+    def knn_search(self, target_position: np.typing.NDArray, k: int, queue: PriorityQueue) -> None:
         """Search within leaf for the k nearest neighbors.
 
         Args:
@@ -139,7 +139,7 @@ class KDTreeNode:
     def __len__(self) -> int:
         return (len(self.left) if self.left is not None else 0) + (len(self.right) if self.right is not None else 0)
 
-    def ball_search(self, position: np.ndarray[float], distance: float) -> list[int]:
+    def ball_search(self, position: np.typing.NDArray, distance: float) -> list[int]:
         """Get the points that are below or equal to a ``distance`` from ``position`` within this node.
 
         Example:
@@ -155,13 +155,16 @@ class KDTreeNode:
             A list of indices, the points that are at a ``radius`` distance from ``position``.
         """
 
-        return (
-            self.left.ball_search(position, distance) if position[self.depth % 2] - distance <= self.midpoint else []
-        ) + (
-            self.right.ball_search(position, distance) if position[self.depth % 2] + distance > self.midpoint else []
-        )
+        queue = []
+        if self.left is not None and position[self.depth % 2] - distance <= self.midpoint:
+            queue += self.left.ball_search(position, distance)
 
-    def knn_search(self, target_position: np.ndarray[float], k: int, queue: PriorityQueue) -> None:
+        if self.right is not None and position[self.depth % 2] + distance > self.midpoint:
+            queue += self.right.ball_search(position, distance)
+
+        return queue
+
+    def knn_search(self, target_position: np.typing.NDArray, k: int, queue: PriorityQueue) -> None:
         """Search within node for the k nearest neighbors.
 
         Example:
@@ -169,7 +172,7 @@ class KDTreeNode:
             >>> from neighbour_search.kdtree_ns import KDTreeNode
             >>> root = KDTreeNode.from_points([(0, np.array([0, 0])), (1, np.array([3, 2]))])
             >>> queue = PriorityQueue()
-            >>> root.knn_search([0, 0], 1, queue)
+            >>> root.knn_search(np.array([0, 0]), 1, queue)
             >>> queue.pop()
             1
 
@@ -179,19 +182,21 @@ class KDTreeNode:
             queue: (max-first) priority queue used for searching. It is modified to contain the final result.
         """
 
-        if len(queue) == 0:
-            self.left.knn_search(target_position, k, queue)
-        else:
-            max_distance = np.sqrt(-queue.queue[0][0])
-            if target_position[self.depth % 2] - max_distance < self.midpoint and len(queue) < k:
+        if self.left is not None:
+            if len(queue) == 0:
                 self.left.knn_search(target_position, k, queue)
+            else:
+                max_distance = np.sqrt(-queue.queue[0][0])
+                if target_position[self.depth % 2] - max_distance < self.midpoint and len(queue) < k:
+                    self.left.knn_search(target_position, k, queue)
 
-        if len(queue) == 0:
-            self.right.knn_search(target_position, k, queue)
-        else:
-            max_distance = np.sqrt(-queue.queue[0][0])
-            if target_position[self.depth % 2] + max_distance > self.midpoint and len(queue) < k:
+        if self.right is not None:
+            if len(queue) == 0:
                 self.right.knn_search(target_position, k, queue)
+            else:
+                max_distance = np.sqrt(-queue.queue[0][0])
+                if target_position[self.depth % 2] + max_distance > self.midpoint and len(queue) < k:
+                    self.right.knn_search(target_position, k, queue)
 
 
 class KDTreeNeighbourSearch(AbstractNeighbourSearch):
@@ -208,7 +213,7 @@ class KDTreeNeighbourSearch(AbstractNeighbourSearch):
         [0, 1]
     """
 
-    def __init__(self, positions: np.ndarray[float], max_leaf: int = 3):
+    def __init__(self, positions: np.typing.NDArray, max_leaf: int = 3):
         """
         Create a new k-d tree, containing the root node.
 
@@ -231,7 +236,7 @@ class KDTreeNeighbourSearch(AbstractNeighbourSearch):
         # get the ``k`` first ones
         return [queue.pop() for _ in range(k)]
 
-    def ball_search(self, position: np.ndarray[float], distance: float) -> list[int]:
+    def ball_search(self, position: np.typing.NDArray, distance: float) -> list[int]:
         assert distance >= 0
 
         return self.root.ball_search(position, distance)
