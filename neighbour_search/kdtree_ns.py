@@ -3,7 +3,7 @@
 
 + Creation is :math:`\\mathcal{O}(n\\log n)`.
 + ``knn_search()`` is :math:`\\mathcal{O}(\\log n)` in the average case.
-+ ``ball_search()`` is :math:`\\mathcal{O}(n)`.
++ ``ball_search()`` is :math:`\\mathcal{O}(\\log n)` in the average case.
 """
 import numpy as np
 import math
@@ -52,31 +52,38 @@ class KDTreeLeaf:
         # return the result
         return queue
 
-    def knn_search(self, target_position: np.typing.NDArray, k: int, queue: PriorityQueue) -> None:
+    def knn_search(
+            self,
+            target_position: np.typing.NDArray,
+            k: int, queue: PriorityQueue,
+            max_dist: float = math.inf
+    ) -> float:
         """Search within leaf for the k nearest neighbors.
 
         Args:
             target_position: A (2,) array, the position of the node of interest.
             k: number of neighbours to return, so ``k >= 0``.
             queue: (max-first) priority queue used for searching. It is modified to contain the final result.
+            max_dist: the largest distance between a point in ``queue`` and ``target_position``.
+                If ``queue`` is empty, should be positive infinite.
+        Returns:
+            The maximum distance between a point in ``queue`` and ``target_position``.
         """
-        max_sq_distance = math.inf
-
-        if len(queue) > 0:
-            max_sq_distance = -queue.queue[0][0]
 
         for i, p in self.points:
             d = (p[0] - target_position[0]) ** 2 + (p[1] - target_position[1]) ** 2
-            if d == 0:
+            if d == 0:  # do not select the target point
                 continue
 
-            if len(queue) < k:
-                queue.push(i, -d)
-            elif d <= max_sq_distance:
-                queue.push(i, -d)
-                queue.pop()
+            queue.push(i, -d)
 
-            max_sq_distance = -queue.queue[0][0]
+        for i in range(len(queue) - k):
+            queue.pop()
+
+        if len(queue) > 0:
+            return np.sqrt(-queue.queue[0][0])
+        else:
+            return max_dist
 
 
 class KDTreeNode:
@@ -164,7 +171,12 @@ class KDTreeNode:
 
         return queue
 
-    def knn_search(self, target_position: np.typing.NDArray, k: int, queue: PriorityQueue) -> None:
+    def knn_search(
+            self,
+            target_position: np.typing.NDArray,
+            k: int, queue: PriorityQueue,
+            max_dist: float = math.inf
+    ) -> float:
         """Search within node for the k nearest neighbors.
 
         Example:
@@ -172,7 +184,7 @@ class KDTreeNode:
             >>> from neighbour_search.kdtree_ns import KDTreeNode
             >>> root = KDTreeNode.from_points([(0, np.array([0, 0])), (1, np.array([3, 2]))])
             >>> queue = PriorityQueue()
-            >>> root.knn_search(np.array([0, 0]), 1, queue)
+            >>> _ = root.knn_search(np.array([0, 0]), 1, queue)
             >>> queue.pop()
             1
 
@@ -180,13 +192,25 @@ class KDTreeNode:
             target_position: A (2,) array, the position of the node of interest.
             k: number of neighbours to return, so ``k >= 0``.
             queue: (max-first) priority queue used for searching. It is modified to contain the final result.
+            max_dist: the largest distance between a point in ``queue`` and ``target_position``.
+                If ``queue`` is empty, should be positive infinite.
+        Returns:
+            The maximum distance between a point in ``queue`` and ``target_position``.
         """
 
         if self.left is not None:
-            self.left.knn_search(target_position, k, queue)
+            if len(queue) < k:
+                max_dist = self.left.knn_search(target_position, k, queue, max_dist)
+            elif target_position[self.depth % 2] - max_dist < self.midpoint:
+                max_dist = self.left.knn_search(target_position, k, queue, max_dist)
 
         if self.right is not None:
-            self.right.knn_search(target_position, k, queue)
+            if len(queue) < k:
+                max_dist = self.right.knn_search(target_position, k, queue, max_dist)
+            elif target_position[self.depth % 2] + max_dist > self.midpoint:
+                max_dist = self.right.knn_search(target_position, k, queue, max_dist)
+
+        return max_dist
 
 
 class KDTreeNeighbourSearch(AbstractNeighbourSearch):
