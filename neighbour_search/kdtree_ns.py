@@ -3,7 +3,7 @@
 
 + Creation is :math:`\\mathcal{O}(n\\log n)`.
 + ``knn_search()`` is :math:`\\mathcal{O}(\\log n)` in the average case.
-+ ``ball_search()``, is :math:`\\mathcal{O}(\\log n)` in the average case.
++ ``ball_search()`` is :math:`\\mathcal{O}(n)`.
 """
 import numpy as np
 import math
@@ -111,7 +111,7 @@ class KDTreeNode:
             max_leaf: maximum leaf size, must be >0.
         """
 
-        midpoint = np.mean([p[1][depth % 2] for p in points])
+        midpoint = np.median([p[1][depth % 2] for p in points])
 
         node = cls(depth, midpoint)
 
@@ -183,20 +183,10 @@ class KDTreeNode:
         """
 
         if self.left is not None:
-            if len(queue) == 0:
-                self.left.knn_search(target_position, k, queue)
-            else:
-                max_distance = np.sqrt(-queue.queue[0][0])
-                if target_position[self.depth % 2] - max_distance < self.midpoint and len(queue) < k:
-                    self.left.knn_search(target_position, k, queue)
+            self.left.knn_search(target_position, k, queue)
 
         if self.right is not None:
-            if len(queue) == 0:
-                self.right.knn_search(target_position, k, queue)
-            else:
-                max_distance = np.sqrt(-queue.queue[0][0])
-                if target_position[self.depth % 2] + max_distance > self.midpoint and len(queue) < k:
-                    self.right.knn_search(target_position, k, queue)
+            self.right.knn_search(target_position, k, queue)
 
 
 class KDTreeNeighbourSearch(AbstractNeighbourSearch):

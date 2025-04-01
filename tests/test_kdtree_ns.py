@@ -22,7 +22,6 @@ def test_ball_some_point_ok(five_close_points):
 
 
 def test_ball_all_point_ok(five_close_ten_apart_points):
-    print(five_close_ten_apart_points)
     ns = NeighbourSearch(five_close_ten_apart_points)
 
     assert set(ns.ball_search(np.array([0, 0]), np.sqrt(2))) == {0, 1, 2, 3, 4}

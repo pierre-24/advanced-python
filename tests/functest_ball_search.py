@@ -10,12 +10,13 @@ import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.patches import Circle
 
-from neighbour_search.kdtree_ns import KDTreeNeighbourSearch as NeighbourSearch, KDTreeNode, KDTreeLeaf
+from neighbour_search.kdtree_ns import KDTreeNeighbourSearch as NeighbourSearch
+from neighbour_search.kdtree_ns import KDTreeNode, KDTreeLeaf
 
 
-class KDTreeTest:
+class BallSearchTest:
     """
-    Test the KDTreeNeighbourSearch class.
+    Test the ``ball_search()`` function.
 
     Display a [-1, 1] x [-1, 1] graph containing ``N`` points.
     Move the mouse to highlight the one within ``radius`` of the mouse position.
@@ -57,12 +58,12 @@ class KDTreeTest:
 
         if node.depth % 2 == 0:
             ax.vlines(node.midpoint, *yr, color='gray', lw=2.0 - node.depth * .3)
-            KDTreeTest.plot_ns_node(ax, node.left, (xr[0], node.midpoint), yr)
-            KDTreeTest.plot_ns_node(ax, node.right, (node.midpoint, xr[1]), yr)
+            BallSearchTest.plot_ns_node(ax, node.left, (xr[0], node.midpoint), yr)
+            BallSearchTest.plot_ns_node(ax, node.right, (node.midpoint, xr[1]), yr)
         else:
             ax.hlines(node.midpoint, *xr, color='gray', lw=2.0 - node.depth * .3)
-            KDTreeTest.plot_ns_node(ax, node.left, xr, (yr[0], node.midpoint))
-            KDTreeTest.plot_ns_node(ax, node.right, xr, (node.midpoint, yr[1]))
+            BallSearchTest.plot_ns_node(ax, node.left, xr, (yr[0], node.midpoint))
+            BallSearchTest.plot_ns_node(ax, node.right, xr, (node.midpoint, yr[1]))
 
     def replot(self):
         """(re)Plot everything."""
@@ -92,4 +93,4 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
-    KDTreeTest(args.r, args.N, args.m).main()
+    BallSearchTest(args.r, args.N, args.m).main()
