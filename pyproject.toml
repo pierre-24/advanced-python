@@ -36,6 +36,7 @@ dev = [
     'sphinx',
     'sphinx-book-theme',
     'mypy',
+    'jupyter',
 ]
 
 [project.scripts]
