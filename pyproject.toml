@@ -27,6 +27,12 @@ dependencies = [
     'matplotlib',
 ]
 
+[project.urls]
+Homepage = "https://github.com/pierre-24/advanced-python/"
+Documentation = "https://pierre-24.github.io/advanced-python/"
+Repository = "https://github.com/pierre-24/advanced-python.git"
+Issues = "https://github.com/pierre-24/advanced-python/issues"
+
 [project.optional-dependencies]
 dev = [
     'flake8',

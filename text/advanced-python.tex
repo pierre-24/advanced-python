@@ -71,6 +71,7 @@ aspectratio=169
 	
 	 So... A meme will now ensue.
 	
+	\pause
 	\begin{center}
 		\includegraphics[width=.6\linewidth]{im/meme-goto}
 		
@@ -232,7 +233,7 @@ def _abs(x: float) -> float:
 	\begin{itemize}
 		\item \textbf{Errors:} we will see below how to play with errors, but if one sticks to \textit{design by contract} alone, this is not required, since the preconditions \textbf{must always} be fulfilled. 
 		
-		In practice, it is generally not the case (\textit{never trust user input}!), and having undefined behaviors may lead to unexpected bugs (since the execution can continue) or even security issues. Thus, one can abide to \textbf{defensive programming} instead, which consists in weakening the precondition (or delete it), and either report failure (throwing exceptions) or running in degraded mode.\footnote{Purely falling would be a bit annoying in a plane ;)}
+		In practice, it is generally not the case (\textit{never trust user input}!), and having undefined behaviors may lead to unexpected bugs (since the execution can continue) or even security issues. Thus, one can abide to \textbf{defensive programming} instead, which consists in weakening the precondition (or delete it), and either report failure (throwing exceptions) or running in degraded mode.\footnote{Purely failing would be a bit annoying in, \textit{e.g.}, a plane ;)}
 		 \item This leads to \textbf{side-effects}, which is the fact that the code have an observable effect other than reading its input and giving an output. Other example of side-effects include: performing I/O, modifying a non-local variable (\textit{e.g.}, matplotlib's \mintinline{python}|pyplot| interface, which is a state machine), or mutate an argument (\textit{e.g.}, sorting a list in-place).\footnote{BLAS and LAPACK are customary of such practices.} \textbf{All} such side-effects should be \textbf{properly} documented.
 	\end{itemize}
 \end{frame}
@@ -314,7 +315,7 @@ As mentioned above, there are two possible reasons for reporting an error:\begin
 
 \begin{frame}[fragile]
 And there are two ways to report an error. One is to use the return value or mutate a global variable (or, on languages that allows it, mutate an input designated for that, like \texttt{ierror}):\begin{minted}{python}
-	def normalize(x: np.ndarray) -> int:
+def normalize(x: np.ndarray) -> int:
 	"""
 	pre: x is a vector
 	post: if return value is 0, x is normalized, if return value is 1, it is not.
@@ -347,11 +348,12 @@ This force the caller to handle the exception. It also effectively separate the 
 The take home message here is:\begin{itemize}
 	\item \mintinline{python}|assert| for the developers,
 	\item \mintinline{python}|throw| (+ documentation) for the programmers, and
-	\item a nice error message (eventually in \texttt{stderr}) for the users. The stacktrace frighten them.
+	\item a nice error message (eventually in \texttt{stderr}) for the users. The stack trace frighten them.
 \end{itemize}
 
 
 And, by the way...
+\pause
 
 \begin{center}
 	\includegraphics[width=.5\linewidth]{im/meme-goto}
@@ -531,7 +533,7 @@ In the worst case scenario, the loop is executed $\log_2 n$ times, so $\Ox{\log 
  
  \begin{frame}[fragile]{Oriented object programming (OOP)}
  	
- 	The goal of OOP is to define new \textbf{abstract data types} (ADT), \textit{i.e.}, separate the concrete representation of the data and their (abstract) signification. For example, a \textit{molecule} (not that you should not define members like this):\begin{columns}
+ 	The goal of OOP is to define new \textbf{abstract data types} (ADT), \textit{i.e.}, separate the concrete representation of the data and their (abstract) signification. For example, a \textit{molecule} (note that you should not define members like this):\begin{columns}
  		\column[t]{.25\linewidth}
  		\begin{minted}{python}
 class Atom:
@@ -619,7 +621,8 @@ In all three cases, although the \textbf{internal representation} (irep) of the 
 \end{frame}
 
 \begin{frame}{Hierarchy of type (i.e., inheritance)}
-	The \textbf{specialization} of an ADT is possible via a mechanism called inheritance.\footnote{Other mechanism, like composition/traits, are possible, see \url{https://en.wikipedia.org/wiki/Composition_over_inheritance}.} The rule being, theoretically, that ``\emph{if \texttt{S} is a subtype of \texttt{T}, \texttt{S} can be used anywhere where \texttt{T} is used}''.\footnote{This is known as the \textit{Liskov substitution principle} and this is... Debated.}
+	The \textbf{specialization} of an ADT is possible via a mechanism called inheritance.\footnote{Other mechanism, like composition/traits, are possible.} The rule being, theoretically, that ``\emph{if \texttt{S} is a subtype of \texttt{T}, \texttt{S} can be used anywhere where \texttt{T} is used}''.\footnote{This is known as the \textit{Liskov substitution principle} and this is... Debated.}	
+	Python rather uses the concept of \textit{duck typing}: ``an object is of a given type if it has (all) the methods of that type''.\footnote{ \url{https://en.wikipedia.org/wiki/Duck_typing}}
 	
 	In practice, given a parent class,  a children class inherit all its parents methods, as well as its invariants (which it should not break) and irep (which it should normally not access directly). It can however re-implement (\textit{override}) some of the parent methods (but should keep their signature!) as well as add new ones.
 	
@@ -634,18 +637,69 @@ In all three cases, although the \textbf{internal representation} (irep) of the 
 
  \section{A few Python's specifics}
  
+ \begin{frame}{Project organization}
+ 	The following organization is recommended:\begin{itemize}
+ 		\item \mintinline{text}|package1/|\begin{itemize}
+ 			\item \mintinline{text}|__init__.py|: this file should be present if you want Python to recognize the directory as a package.
+ 			\item \mintinline{text}|x.py|: use  \mintinline{python}|from package1.x import y| anywhere in your project to import things from this file.
+ 			\item \mintinline{text}|...|
+ 		\end{itemize}
+ 		\item \mintinline{text}|package2/|: a project can contain more than one package.
+ 		\item \mintinline{text}|tests/|: tests files (can be also in each package if you prefer)
+ 		\item \mintinline{text}|docs/|: documentation files
+ 		\item \mintinline{text}|README.md|: The starting point for any info
+ 		\item \mintinline{text}|LICENSE|: How do you want your project to be reused?
+ 		\item \mintinline{text}|pyproject.toml|: Tell Python about your project! Thanks to that file, it knows what to install and how.\footnote{See \url{https://packaging.python.org/en/latest/guides/writing-pyproject-toml/}, regularly.}
+ 	\end{itemize}
+ 	\vspace{1em}
+ \end{frame}
+ 
+ \begin{frame}[fragile]
+ Use a \textbf{virtual environment}: it is ``used to contain a specific Python interpreter and software libraries and binaries which are needed to support a project (library or application). These are by default isolated from software in other virtual environments and Python interpreters and libraries installed in the operating system."\footnote{\url{https://docs.python.org/3/library/venv.html}}
+ 
+ The workflow is the following:\begin{minted}{bash}
+# create a new virtualenv
+python -m venv venv
+# use venv
+source venv/bin/activate
+pip install ...
+python ...
+# get out of venv
+deactivate
+ \end{minted}
+ \end{frame}
+ 
  \begin{frame}
- 	\begin{itemize}
- 		 \item \url{https://en.wikipedia.org/wiki/Duck_typing} (``an object is of a given type if it has (all) the methods of that type'')
- 		 \item The zen of python?
- 		\item typing and linting
- 		\item Use git
- 		\item Don't reinvent the wheel (\textit{battery (already) included})
- 		\item README \& LICENSE
- 		\item packages (\texttt{import stuff})
- 		\item Project (\texttt{pyproject.toml})
- 		\item virtualenv
+ 	\begin{center}
+ 		{\LARGE DEMO TIME!} 
+ 		
+ 		(\mintinline{text}|pyproject.toml| and virtualenv, don't forget \mintinline{text}|-e.[dev]|)
+ 	\end{center}
+ 	And don't forget: \textbf{use git}, so...\begin{itemize}
+ 		\item \mintinline{text}|.gitignore|:  you can use \url{http://gitignore.io/} to create one.
+ 		\item  \mintinline{text}|.github/|: automatically launch tests, do lints,  build docs, etc (only on Github).
  	\end{itemize}
  \end{frame}
+ 
+ \begin{frame}{Writing ``beautiful'' Python}
+ Do you like writing beautiful code? Afraid of missing something? Ever dreamed of getting screamed at by Python? Say no more!\begin{itemize}
+ 	\item Don't reinvent the wheel: the standard library of Python is packed with good stuffs, try them! Also, the  \mintinline{text}|scipy| stack is awesome for us.
+ 	\item Follow the ``zen of Python''\footnote{\url{https://peps.python.org/pep-0020/}} and the other philosophical principles/maxims of the Python community.
+ 	\item use \mintinline{text}|flake8|: checks that your code follows the Python style guidelines. These are a set of rather strict rules, but you can modulate them by using a  \mintinline{text}|.flake8| file.\footnote{\url{https://flake8.pycqa.org/en/latest/}}
+ 	\item Use  \mintinline{text}|mypy|: checks that your type annotation make sense. It might seems useless or trivial, but don't forget that those pesky \mintinline{python}|None| can get in the way (generating unexpected bugs).
+ \end{itemize}
+ \end{frame}
+ 
+ \section{Conclusion(s?)}
+
+ \begin{frame}
+	\begin{center}
+		{\LARGE Programming \textbf{is} fun: don't forget to have fun ;)}
+		
+		(but maybe think a bit before you implement something)
+		
+		(although a project should always be done twice)
+	\end{center}
+\end{frame}
 
 \end{document}
