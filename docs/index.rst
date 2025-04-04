@@ -1,7 +1,7 @@
 ``neighbour_search`` documentation
 ==================================
 
-Example of documentation for ``neighbour_search``.
+This package implements different approaches to perform a ball search and a kNN search, in 2D.
 
 .. contents:: On this page
    :local:
@@ -9,6 +9,14 @@ Example of documentation for ``neighbour_search``.
 
 Installation
 ------------
+
+To use the ``neighbour_search`` package:
+
+.. code-block:: bash
+
+   pip install git+https://github.com/pierre-24/advanced-python.git
+
+To follow the lecture:
 
 .. code-block:: bash
 
@@ -20,6 +28,7 @@ Installation
    # install dev packages
    pip install -e.[dev]
 
+If you want to contribute, follow the previous instructions, but use a fork instead.
 
 API
 ---
@@ -44,6 +53,14 @@ k-d tree implementation
 +++++++++++++++++++++++
 
 .. automodule:: neighbour_search.kdtree_ns
+   :members:
+   :show-inheritance:
+   :undoc-members:
+
+Ball tree implementation
+++++++++++++++++++++++++
+
+.. automodule:: neighbour_search.balltree_ns
    :members:
    :show-inheritance:
    :undoc-members:
