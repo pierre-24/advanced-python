@@ -23,11 +23,11 @@ class KNNSearchTest:
     Move the mouse to highlight a point and its ``k`` closest neighbour.
     """
 
-    def __init__(self, k: int = 5, N: int = 100, min_leaf: int = 3):
+    def __init__(self, k: int = 5, N: int = 100, leaf_size: int = 3):
         self.k = k
         self.points = 2 * (np.random.random((N, 2)) - [.5, .5])
 
-        self.ns = NeighbourSearch(self.points, max_leaf=min_leaf)
+        self.ns = NeighbourSearch(self.points, leaf_size=leaf_size)
 
         self.figure = plt.figure(figsize=(8, 8))
         self.ax = self.figure.subplots()
