@@ -31,7 +31,7 @@ class BallTreeLeaf:
         self.points = points
 
         self.center = np.mean([p[1] for p in points], axis=0)
-        self.sq_radius = np.max([((p[1] - self.center)**2).sum() for p in points])
+        self.radius = np.sqrt(np.max([((p[1] - self.center) ** 2).sum() for p in points]))
 
     def __len__(self) -> int:
         return len(self.points)
@@ -47,7 +47,7 @@ class BallTreeLeaf:
         """
 
         # triangle inequality
-        if ((self.center - position)**2).sum() > distance ** 2 + self.sq_radius:
+        if ((self.center - position)**2).sum() > (distance + self.radius) ** 2:
             return []
 
         # create queue
@@ -55,7 +55,7 @@ class BallTreeLeaf:
 
         # put item in queue
         for i, p in self.points:
-            d = (p[0] - position[0]) ** 2 + (p[1] - position[1]) ** 2
+            d = ((p - position)**2).sum()
             if d <= distance ** 2:
                 queue.append(i)
 
@@ -66,7 +66,7 @@ class BallTreeLeaf:
             self,
             target_position: np.typing.NDArray,
             k: int, queue: PriorityQueue,
-            max_sq_dist: float = np.inf
+            max_dist: float = np.inf
     ) -> float:
         """Search within leaf for the k nearest neighbors.
 
@@ -74,13 +74,13 @@ class BallTreeLeaf:
             target_position: A (2,) array, the position of the node of interest.
             k: number of neighbours to return, so ``k >= 0``.
             queue: (max-first) priority queue used for searching. It is modified to contain the final result.
-            max_sq_dist: the largest squared distance between a point in ``queue`` and ``target_position``.
+            max_dist: the largest distance between a point in ``queue`` and ``target_position``.
                 If ``queue`` is empty, should be positive infinite.
         Returns:
-            The maximum squared distance between a point in ``queue`` and ``target_position``.
+            The maximum distance between a point in ``queue`` and ``target_position``.
         """
 
-        if ((self.center - target_position)**2).sum() < max_sq_dist + self.sq_radius:  # triangle inequality
+        if ((self.center - target_position)**2).sum() < max_dist + self.radius:  # triangle inequality
             for i, p in self.points:
                 d = (p[0] - target_position[0]) ** 2 + (p[1] - target_position[1]) ** 2
                 if d == 0:  # do not select the target point
@@ -92,9 +92,9 @@ class BallTreeLeaf:
                 queue.pop()
 
             if len(queue) > 0:
-                return -queue.queue[0][0]
+                return np.sqrt(-queue.queue[0][0])
 
-        return max_sq_dist
+        return max_dist
 
 
 class BallTreeNode:
@@ -104,16 +104,16 @@ class BallTreeNode:
         Each node in the tree defines the smallest ball that contains all data points in its subtree.
     """
 
-    def __init__(self, center: np.typing.NDArray, sq_radius: float):
+    def __init__(self, center: np.typing.NDArray, radius: float):
         """Create an empty node.
 
         Args:
             center: central point
-            sq_radius: square of the largest distance from ``center`` to any of the points it contains.
+            radius: largest distance from ``center`` to any of the points it contains.
         """
 
         self.center = center
-        self.sq_radius = sq_radius
+        self.radius = radius
 
         self.left: Optional[BallTreeNode | BallTreeLeaf] = None
         self.right: Optional[BallTreeNode | BallTreeLeaf] = None
@@ -140,7 +140,9 @@ class BallTreeNode:
         Use the so-called "bouncing bubble" algorithm:
 
         1. Pick ``a``, the point farthest from ``points[0]``
-        2. Pick ``b``, the point farthest from ``a``
+        2. Pick ``b``, the point farthest from ``a``.
+        3. The center is the midpoint between those two points
+        4. Split in two based on the proximity of each point with ``a`` and ``b``.
 
         Args:
             points: the points, as a ``(id, position)`` list.
@@ -150,7 +152,7 @@ class BallTreeNode:
         a = cls._farthest_from(0, points)
         b = cls._farthest_from(a, points)
 
-        center = points[b][1] - points[a][1]
+        center = (points[b][1] + points[a][1]) / 2
         sqradius = .0
 
         to_left = []
@@ -169,7 +171,7 @@ class BallTreeNode:
             if dc > sqradius:
                 sqradius = dc
 
-        node = cls(center, sqradius)
+        node = cls(center, np.sqrt(sqradius))
 
         if len(to_left) > leaf_size:
             node.left = BallTreeNode.from_points(to_left, leaf_size)
@@ -203,7 +205,7 @@ class BallTreeNode:
         """
 
         # triangle inequality
-        if ((self.center - position)**2).sum() > distance ** 2 + self.sq_radius:
+        if ((self.center - position)**2).sum() > (distance + self.radius) ** 2:
             return []
 
         # ok, it might be in this node :)
@@ -220,7 +222,7 @@ class BallTreeNode:
             self,
             target_position: np.typing.NDArray,
             k: int, queue: PriorityQueue,
-            max_sq_dist: float = np.inf
+            max_dist: float = np.inf
     ) -> float:
         """Search within node for the k nearest neighbors.
 
@@ -237,21 +239,20 @@ class BallTreeNode:
             target_position: A (2,) array, the position of the node of interest.
             k: number of neighbours to return, so ``k >= 0``.
             queue: (max-first) priority queue used for searching. It is modified to contain the final result.
-            max_sq_dist: the largest squared distance between a point in ``queue`` and ``target_position``.
+            max_dist: the largest distance between a point in ``queue`` and ``target_position``.
                 If ``queue`` is empty, should be positive infinite.
         Returns:
-            The maximum squared distance between a point in ``queue`` and ``target_position``.
+            The maximum distance between a point in ``queue`` and ``target_position``.
         """
 
-        if ((self.center - target_position)**2).sum() < max_sq_dist + self.sq_radius:  # triangle inequality
-
+        if ((self.center - target_position)**2).sum() < (max_dist + self.radius) ** 2:  # triangle inequality
             if self.left is not None:
-                max_sq_dist = self.left.knn_search(target_position, k, queue, max_sq_dist)
+                max_dist = self.left.knn_search(target_position, k, queue, max_dist)
 
             if self.right is not None:
-                max_sq_dist = self.right.knn_search(target_position, k, queue, max_sq_dist)
+                max_dist = self.right.knn_search(target_position, k, queue, max_dist)
 
-        return max_sq_dist
+        return max_dist
 
 
 class BallTreeNeighbourSearch(AbstractNeighbourSearch):
@@ -268,7 +269,7 @@ class BallTreeNeighbourSearch(AbstractNeighbourSearch):
         [0, 1]
     """
 
-    def __init__(self, positions: np.typing.NDArray, leaf_size: int = 3):
+    def __init__(self, positions: np.typing.NDArray, leaf_size: int = 5):
         """
         Create a new balltree, containing the root node.
 

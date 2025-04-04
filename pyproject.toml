@@ -48,7 +48,7 @@ dev = [
 [project.scripts]
 
 [tool.setuptools]
-packages = ["neighbour_search"]
+packages = ["neighbour_search", "neighbour_search.scripts"]
 
 [tool.setuptools.dynamic]
 version = {attr = "neighbour_search.__version__"}
