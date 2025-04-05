@@ -47,6 +47,22 @@ They both display a set of points, and highlight the one found, depending on the
 You can switch between different implementations using ``-t``.
 Use ``--help`` for other options.
 
+Performances
+------------
+
+Timing for a ball search (:math:`\frac{\sqrt{N}}{10}` points) and kNN (10 neighbour) selection among :math:`N` points, randomly positioned in a :math:`\sqrt{N}\times\sqrt{N}` box.
+Leaf size is 100.
+Each selection is repeated 25 times and a mean and standard deviation is then computed.
+
+.. figure:: ./performances.svg
+   :width: 600px
+   :align: center
+   :alt: Performance test
+
+   Performance test performed on AMD Ryzen 7 7700.
+   The error bars indicate :math:`[-2\sigma,2\sigma]`.
+   Notice the logarithmic scale.
+
 API
 ---
 
