@@ -99,11 +99,16 @@ aspectratio=169
 \end{frame}
 
 \begin{frame}{Note on the ``who''}
+	\begin{columns}
+		\column{.5\linewidth}
 In the rest of this presentation, I will (sometimes) distinguish three kinds of people:\begin{enumerate}
 	\item The \textbf{developers}, who actually develop the code/library and eventually provide an API (\textit{application programming interface}).
 	\item The \textbf{programmers}, who use the API provided by the code/library and develop on top of it.
 	\item The \textbf{users}, who use the program/executable, but do not program.
 \end{enumerate}
+\column{.5\linewidth}
+\includegraphics[width=\linewidth]{im/meme-progs}
+\end{columns}
 \end{frame}
 
 \section{It's all about abstraction}
@@ -293,7 +298,7 @@ class Dog {
 		\item mkdocstring (used with mkdocs), which uses markdown ;
 		\item pdoc3, which uses markdown.
 	\end{itemize}
-	All three of four generates an HTML output (which is generally what you want). They supports LaTeX formula by various means.
+	All four generates an HTML output (which is generally what you want). They supports LaTeX formula by various means.
 \end{frame}
 
 \begin{frame}
