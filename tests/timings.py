@@ -27,7 +27,7 @@ def time_knn(ns: AbstractNeighbourSearch, N: int = 10, repeat: int = 25) -> tupl
     """
     Time (as mean and standard deviation) for `N` kNN, repeated `repeat` times.
     """
-    timer = timeit.Timer(lambda: ns.knn_search(np.random.randint(0, len(ns)), 10))
+    timer = timeit.Timer(lambda: ns.knn_search(np.random.randint(0, len(ns)), 20))
     rp = timer.repeat(repeat, N)
     return np.mean(rp) / N, np.std(rp) / N
 
@@ -80,14 +80,36 @@ if __name__ == '__main__':
     figure = plt.figure(figsize=(6, 8))
     ax1, ax2 = figure.subplots(2, sharex=True, sharey=True)
 
+    def _plot(ax, data: pd.DataFrame, test: str, fit, color: str, label: str):
+        ax.errorbar(
+            data['N'],
+            data['{}_mean'.format(test)],
+            yerr=2 * subdata['{}_std'.format(test)],
+            fmt='o-',
+            color=color,
+            capsize=5,
+            label=label,
+        )
+
+        ax.plot(subdata['N'], fit(subdata['N'], subdata['{}_mean'.format(test)]), '--', color=color)
+
     # ball test
     subdata = data[data['test'] == 'ball']
-    ax1.errorbar(
-        subdata['N'], subdata['naive_mean'], yerr=2 * subdata['naive_std'], fmt='o-', capsize=5, label='Naive')
-    ax1.errorbar(
-        subdata['N'], subdata['kdt_mean'], yerr=2 * subdata['kdt_std'], fmt='o-', capsize=5, label='KDTree')
-    ax1.errorbar(
-        subdata['N'], subdata['ballt_mean'], yerr=2 * subdata['ballt_std'], fmt='o-', capsize=5, label='BallTree')
+    _plot(
+        ax1, subdata,
+        'naive', lambda x, y: x * (y.iloc[0] / x.iloc[0]),
+        'C0', 'Naive [$O(N)$]'
+    )
+    _plot(
+        ax1, subdata,
+        'kdt', lambda x, y: np.log(x) * (y.iloc[0] / np.log(x.iloc[0])),
+        'C1', 'k-d tree [$O(\\log N)$]'
+    )
+    _plot(
+        ax1, subdata,
+        'ballt', lambda x, y: np.log(x) * (y.iloc[0] / np.log(x.iloc[0])),
+        'C2', 'Ball tree [$O(\\log N)$]'
+    )
 
     ax1.set_yscale('log')
     ax1.set_xscale('log')
@@ -99,13 +121,23 @@ if __name__ == '__main__':
 
     # knn test
     subdata = data[data['test'] == 'knn']
-    ax2.errorbar(
-        subdata['N'], subdata['naive_mean'], yerr=2 * subdata['naive_std'], fmt='o-', capsize=5, label='Naive')
-    ax2.errorbar(
-        subdata['N'], subdata['kdt_mean'], yerr=2 * subdata['kdt_std'], fmt='o-', capsize=5, label='KDTree')
-    ax2.errorbar(
-        subdata['N'], subdata['ballt_mean'], yerr=2 * subdata['ballt_std'], fmt='o-', capsize=5, label='BallTree')
+    _plot(
+        ax2, subdata,
+        'naive', lambda x, y: x * np.log(x) * (y.iloc[0] / (x.iloc[0] * np.log(x.iloc[0]))),
+        'C0', 'Naive [$O(N\\log N)$]'
+    )
+    _plot(
+        ax2, subdata,
+        'kdt', lambda x, y: x * (y.iloc[0] / x.iloc[0]),
+        'C1', 'k-d tree [$O(N)$]'
+    )
+    _plot(
+        ax2, subdata,
+        'ballt', lambda x, y: np.log(x) * (y.iloc[0] / np.log(x.iloc[0])),
+        'C2', 'Ball tree [$O(\\log N)$]'
+    )
 
+    ax2.legend()
     ax2.set_xlabel('N')
     ax2.set_ylabel('Mean time for selection (s)')
     ax2.set_title('kNN search')

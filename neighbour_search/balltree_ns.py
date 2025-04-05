@@ -80,7 +80,7 @@ class BallTreeLeaf:
             The maximum distance between a point in ``queue`` and ``target_position``.
         """
 
-        if ((self.center - target_position)**2).sum() < max_dist + self.radius:  # triangle inequality
+        if len(queue) < k or ((self.center - target_position)**2).sum() < max_dist + self.radius:  # triangle inequality
             for i, p in self.points:
                 d = (p[0] - target_position[0]) ** 2 + (p[1] - target_position[1]) ** 2
                 if d == 0:  # do not select the target point
@@ -153,35 +153,25 @@ class BallTreeNode:
         b = cls._farthest_from(a, points)
 
         center = (points[b][1] + points[a][1]) / 2
-        sqradius = .0
 
-        to_left = []
-        to_right = []
+        sqradius = np.max([((p[1] - center) ** 2).sum() for p in points])
+        da = np.array([((p[1] - points[a][1]) ** 2).sum() for p in points])
+        db = np.array([((p[1] - points[b][1]) ** 2).sum() for p in points])
 
-        for i, p in points:
-            da = ((p - points[a][1])**2).sum()
-            db = ((p - points[b][1])**2).sum()
-
-            if da < db:
-                to_left.append((i, p))
-            else:
-                to_right.append((i, p))
-
-            dc = ((p - center)**2).sum()
-            if dc > sqradius:
-                sqradius = dc
+        to_left = np.where(da <= db)[0]
+        to_right = np.where(db < da)[0]
 
         node = cls(center, np.sqrt(sqradius))
 
         if len(to_left) > leaf_size:
-            node.left = BallTreeNode.from_points(to_left, leaf_size)
+            node.left = BallTreeNode.from_points([points[i] for i in to_left], leaf_size)
         elif len(to_left) > 0:
-            node.left = BallTreeLeaf(to_left)
+            node.left = BallTreeLeaf([points[i] for i in to_left])
 
         if len(to_right) > leaf_size:
-            node.right = BallTreeNode.from_points(to_right, leaf_size)
+            node.right = BallTreeNode.from_points([points[i] for i in to_right], leaf_size)
         elif len(to_right) > 0:
-            node.right = BallTreeLeaf(to_right)
+            node.right = BallTreeLeaf([points[i] for i in to_right])
 
         return node
 
@@ -224,7 +214,9 @@ class BallTreeNode:
             k: int, queue: PriorityQueue,
             max_dist: float = np.inf
     ) -> float:
-        """Search within node for the k nearest neighbors.
+        """
+        Search within node for the k nearest neighbors.
+        To achieve good performances, the node that is the closest to ``target_position`` is preferentially visited.
 
         Example:
             >>> from neighbour_search import PriorityQueue
@@ -245,12 +237,21 @@ class BallTreeNode:
             The maximum distance between a point in ``queue`` and ``target_position``.
         """
 
-        if ((self.center - target_position)**2).sum() < (max_dist + self.radius) ** 2:  # triangle inequality
+        # triangle inequality
+        if len(queue) < k or ((self.center - target_position)**2).sum() < (max_dist + self.radius) ** 2:
+            node_visit = []
+
             if self.left is not None:
-                max_dist = self.left.knn_search(target_position, k, queue, max_dist)
+                node_visit.append(self.left)
 
             if self.right is not None:
-                max_dist = self.right.knn_search(target_position, k, queue, max_dist)
+                node_visit.append(self.right)
+
+            # go to the node closest to `target_point` first
+            node_visit.sort(key=lambda n: ((n.center - target_position)**2).sum())
+
+            for node in node_visit:
+                max_dist = node.knn_search(target_position, k, queue, max_dist)
 
         return max_dist
 

@@ -2,7 +2,7 @@
 `k-d tree <https://en.wikipedia.org/wiki/K-d_tree>`_ neighbour search implementation.
 
 + Creation is :math:`\\mathcal{O}(n\\log n)`.
-+ ``knn_search()`` is :math:`\\mathcal{O}(\\log n)` in the average case.
++ ``knn_search()`` is :math:`\\mathcal{O}(n)` in the average case.
 + ``ball_search()`` is :math:`\\mathcal{O}(\\log n)` in the average case.
 """
 import numpy as np

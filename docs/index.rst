@@ -50,17 +50,16 @@ Use ``--help`` for other options.
 Performances
 ------------
 
-Timing for a ball search (:math:`\frac{\sqrt{N}}{10}` points) and kNN (10 neighbour) selection among :math:`N` points, randomly positioned in a :math:`\sqrt{N}\times\sqrt{N}` box.
-Leaf size is 100.
-Each selection is repeated 25 times and a mean and standard deviation is then computed.
-
 .. figure:: ./performances.svg
    :width: 600px
    :align: center
    :alt: Performance test
 
+   Timing for a ball search (:math:`\frac{\sqrt{N}}{10}` points) and kNN (20 neighbour) selection among :math:`N` points, randomly positioned in a :math:`\sqrt{N}\times\sqrt{N}` box.
+   Leaf size is 100.
+   Each selection is repeated 25 times and a mean and standard deviation is then computed.
    Performance test performed on AMD Ryzen 7 7700.
-   The error bars indicate :math:`[-2\sigma,2\sigma]`.
+   The error bars indicate :math:`[-2\sigma,2\sigma]`, while the dashed lines indicate the (supposed) computational complexity.
    Notice the logarithmic scale.
 
 API
