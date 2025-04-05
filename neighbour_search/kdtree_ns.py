@@ -2,11 +2,10 @@
 `k-d tree <https://en.wikipedia.org/wiki/K-d_tree>`_ neighbour search implementation.
 
 + Creation is :math:`\\mathcal{O}(n\\log n)`.
-+ ``knn_search()`` is :math:`\\mathcal{O}(\\log n)` in the average case.
++ ``knn_search()`` is :math:`\\mathcal{O}(n)` in the average case.
 + ``ball_search()`` is :math:`\\mathcal{O}(\\log n)` in the average case.
 """
 import numpy as np
-import math
 
 from typing import Optional, Self
 
@@ -56,7 +55,7 @@ class KDTreeLeaf:
             self,
             target_position: np.typing.NDArray,
             k: int, queue: PriorityQueue,
-            max_dist: float = math.inf
+            max_dist: float = np.inf
     ) -> float:
         """Search within leaf for the k nearest neighbors.
 
@@ -108,14 +107,14 @@ class KDTreeNode:
         self.right: Optional[KDTreeNode | KDTreeLeaf] = None
 
     @classmethod
-    def from_points(cls, points: list[tuple[int, np.ndarray]], depth: int = 0, max_leaf: int = 3) -> Self:
+    def from_points(cls, points: list[tuple[int, np.ndarray]], depth: int = 0, leaf_size: int = 3) -> Self:
         """
         Build the node from a list of points.
 
         Args:
             points: the points, as a ``(id, position)`` list.
             depth: depth of this node, so ``depth >= 0``.
-            max_leaf: maximum leaf size, must be >0.
+            leaf_size: maximum leaf size, must be >0.
         """
 
         midpoint = np.median([p[1][depth % 2] for p in points])
@@ -131,13 +130,13 @@ class KDTreeNode:
             else:
                 to_right.append(p)
 
-        if len(to_left) > max_leaf:
-            node.left = KDTreeNode.from_points(to_left, depth + 1, max_leaf)
+        if len(to_left) > leaf_size:
+            node.left = KDTreeNode.from_points(to_left, depth + 1, leaf_size)
         elif len(to_left) > 0:
             node.left = KDTreeLeaf(to_left)
 
-        if len(to_right) > max_leaf:
-            node.right = KDTreeNode.from_points(to_right, depth + 1, max_leaf)
+        if len(to_right) > leaf_size:
+            node.right = KDTreeNode.from_points(to_right, depth + 1, leaf_size)
         elif len(to_right) > 0:
             node.right = KDTreeLeaf(to_right)
 
@@ -175,7 +174,7 @@ class KDTreeNode:
             self,
             target_position: np.typing.NDArray,
             k: int, queue: PriorityQueue,
-            max_dist: float = math.inf
+            max_dist: float = np.inf
     ) -> float:
         """Search within node for the k nearest neighbors.
 
@@ -227,18 +226,18 @@ class KDTreeNeighbourSearch(AbstractNeighbourSearch):
         [0, 1]
     """
 
-    def __init__(self, positions: np.typing.NDArray, max_leaf: int = 3):
+    def __init__(self, positions: np.typing.NDArray, leaf_size: int = 3):
         """
         Create a new k-d tree, containing the root node.
 
         Args:
             positions: the points
-            max_leaf: maximum leaf size, must be >0.
+            leaf_size: maximum leaf size, must be >0.
         """
-        assert max_leaf > 0
+        assert leaf_size > 0
 
         super().__init__(positions)
-        self.root = KDTreeNode.from_points([(i, positions[i]) for i in range(positions.shape[0])], 0, max_leaf)
+        self.root = KDTreeNode.from_points([(i, positions[i]) for i in range(positions.shape[0])], 0, leaf_size)
 
     def knn_search(self, target: int, k: int) -> list[int]:
         assert 0 <= target < len(self)
@@ -254,6 +253,3 @@ class KDTreeNeighbourSearch(AbstractNeighbourSearch):
         assert distance >= 0
 
         return self.root.ball_search(position, distance)
-
-    def __len__(self):
-        return len(self.root)
