@@ -148,7 +148,7 @@ info_circle(7.2)
 
 
 \begin{frame}[fragile]
-	An example of data abstraction (\texttt{fp32}):
+	An example of data abstraction:
 	\begin{center}
 		\begin{tikzpicture}
 			\draw (0, 0) rectangle +(1, 1)  node[midway] {$\mathcal{S}$};
@@ -163,6 +163,7 @@ info_circle(7.2)
 			x = (-1)^\mathcal{S} \times 2^{\mathcal{E}-2^7} \times \left(1+\frac{\mathcal M}{2^{23}}\right).
 		\end{equation*}
 	\end{center}
+	\pause
 	And yet...
 	\begin{minted}{python}
 # let's play with floats:
@@ -327,7 +328,7 @@ def normalize(x: np.ndarray) -> int:
 	"""
 	norm = np.linalg.norm(x)
 	if norm == 0:
-	return 1
+		return 1
 	x /= norm
 	return 0
 \end{minted}

@@ -45,6 +45,8 @@ class PriorityQueue:
         """
         Pop the first item (the one with the lowest priority).
 
+        Returns:
+            The item with the lowest priority in the queue.
         Raises:
              KeyError: if empty.
         """
